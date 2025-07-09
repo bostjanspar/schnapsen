@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, forwardRef } from '@angular/core';
 import { GameState } from '../models/game-state.model';
 import { Player } from '../models/player.model';
 import { Card, Rank, Suit } from '../models/card.model';
@@ -6,6 +6,7 @@ import { Card, Rank, Suit } from '../models/card.model';
 import { PlayerService } from './player.service';
 import { GameLogicService } from './game-logic.service';
 import { TrickService } from './trick.service';
+import { StateMachineService } from './state-machine.service'; // Import StateMachineService
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,12 @@ export class GameService {
 
   private gameState!: GameState; // Marked as definitely assigned
 
-  constructor(private trickService: TrickService, private gameLogicService: GameLogicService, private playerService: PlayerService) { }
+  constructor(
+    private trickService: TrickService,
+    private gameLogicService: GameLogicService,
+    private playerService: PlayerService,
+    @Inject(forwardRef(() => StateMachineService)) private stateMachineService: StateMachineService // Inject StateMachineService
+  ) { }
 
   public getGameState(): GameState {
     return this.gameState;
@@ -100,31 +106,36 @@ export class GameService {
   public playCard(card: Card): void {
     if (this.gameLogicService.isValidMove(this.gameState, card)) {
       this.gameState = this.trickService.playCard(this.gameState, card);
-      if (this.gameState.currentTrick.length === 0) { // Trick is finished
+
+      // If trick just ended, draw cards
+      if (this.gameState.currentTrick.length === 0) { 
         const winner = this.gameLogicService.getLastTrickWinner(this.gameState);
-        if (winner) { // Ensure winner is not null
+        if (winner) {
           const loser = this.gameState.players.find(p => p.id !== winner.id);
-          if (loser) { // Ensure loser is not undefined
+          if (loser) {
             this.playerService.drawCard(this.gameState, winner);
             this.playerService.drawCard(this.gameState, loser);
           }
         }
-      }
-
-      const handWinner = this.gameLogicService.checkHandWinner(this.gameState);
-      if (handWinner) {
-        this.endHand(handWinner);
-      }
-      const gameWinner = this.gameLogicService.checkGameWinner(this.gameState);
-      if (gameWinner) {
-        // Game over
+        // After trick, check for hand end conditions
+        const handWinner = this.gameLogicService.checkHandWinner(this.gameState);
+        if (handWinner) {
+          this.stateMachineService.transitionTo('HAND_END', handWinner);
+        } else if (this.isLastTrick()) {
+          const lastTrickWinner = this.gameLogicService.getLastTrickWinner(this.gameState);
+          if (lastTrickWinner) {
+            this.stateMachineService.transitionTo('HAND_END', lastTrickWinner);
+          }
+        } else {
+          this.stateMachineService.transitionTo('TRICK_START');
+        }
       }
     }
   }
 
-  private endHand(winner: Player): void {
+  public calculateHandResult(winner: Player): void {
     const loser = this.gameState.players.find(p => p.id !== winner.id);
-    if (!loser) return; // Ensure loser is not undefined
+    if (!loser) return; 
 
     let points = 1;
     if (loser.score < 33) {
@@ -134,14 +145,13 @@ export class GameService {
       points = 3; // Schwarz
     }
     winner.gamePoints -= points;
-    this.newHand();
   }
 
-  private newHand(): void {
+  public resetHand(): void {
     this.gameState.deck = this.initializeDeck();
     this.gameState.talon = [];
-    this.gameState.trumpCard = undefined; // Use undefined for optional properties
-    this.gameState.trumpSuit = undefined; // Use undefined for optional properties
+    this.gameState.trumpCard = undefined; 
+    this.gameState.trumpSuit = undefined; 
     this.gameState.isTalonClosed = false;
     this.gameState.currentTrick = [];
     this.gameState.tricks = [];
@@ -158,17 +168,16 @@ export class GameService {
     const player = this.gameState.players.find(p => p.id === this.gameState.currentPlayerId);
     if (!player) return;
 
-    // Ensure trumpSuit is defined before using it
     if (this.gameState.trumpSuit === undefined) return;
 
     const jackIndex = player.hand.findIndex(c => c.rank === Rank.Jack && c.suit === this.gameState.trumpSuit);
-    if (jackIndex === -1) return; // Player does not have the trump jack
+    if (jackIndex === -1) return; 
 
-    if (this.gameState.talon.length === 0 || this.gameState.isTalonClosed) return; // Talon is closed or empty
+    if (this.gameState.talon.length === 0 || this.gameState.isTalonClosed) return; 
 
     const jack = player.hand[jackIndex];
-    const trumpCard = this.gameState.trumpCard; // Get trumpCard before replacing
-    if (trumpCard) { // Ensure trumpCard exists
+    const trumpCard = this.gameState.trumpCard; 
+    if (trumpCard) { 
       player.hand.splice(jackIndex, 1);
       player.hand.push(trumpCard);
       this.gameState.trumpCard = jack;
@@ -182,9 +191,8 @@ export class GameService {
     const kingIndex = player.hand.findIndex(c => c.rank === marriage.king.rank && c.suit === marriage.king.suit);
     const queenIndex = player.hand.findIndex(c => c.rank === marriage.queen.rank && c.suit === marriage.queen.suit);
 
-    if (kingIndex === -1 || queenIndex === -1) return; // Player does not have the marriage
+    if (kingIndex === -1 || queenIndex === -1) return; 
 
-    // Ensure trumpSuit is defined before using it
     if (this.gameState.trumpSuit === undefined) return;
 
     const points = marriage.king.suit === this.gameState.trumpSuit ? 40 : 20;
@@ -194,5 +202,21 @@ export class GameService {
   public closeTalon(): void {
     if (this.gameState.talon.length < 3) return;
     this.gameState.isTalonClosed = true;
+  }
+
+  public checkHandWinner(): Player | null {
+    return this.gameLogicService.checkHandWinner(this.gameState);
+  }
+
+  public getLastTrickWinner(): Player | null {
+    return this.gameLogicService.getLastTrickWinner(this.gameState);
+  }
+
+  public checkGameWinner(): Player | null {
+    return this.gameLogicService.checkGameWinner(this.gameState);
+  }
+
+  public isLastTrick(): boolean {
+    return this.gameState.talon.length === 0 && this.gameState.players.every(p => p.hand.length === 1);
   }
 }
