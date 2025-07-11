@@ -1,25 +1,27 @@
-import { Injectable, Inject, forwardRef } from '@angular/core';
-import { GameState } from '../models/game-state.model';
+import { Injectable } from '@angular/core';
+import { Deck } from '../models/deck.model';
+import { Card } from '../models/card.model';
 import { Player } from '../models/player.model';
-import { Card, Rank, Suit } from '../models/card.model';
-
-import { PlayerService } from './player.service';
-import { GameLogicService } from './game-logic.service';
+import { StateMachineService } from './state-machine.service';
 import { TrickService } from './trick.service';
-import { StateMachineService } from './state-machine.service'; // Import StateMachineService
+import { PlayerService } from './player.service';
+import { GameStateName } from '../models/game-state-name.enum';
+import { Suit } from '../models/suit.enum';
+import { Rank } from '../models/rank.enum';
+import { GameState } from '../models/game-state.model';
+import { GameLogicService } from './game-logic.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GameService {
-
-  private gameState!: GameState; // Marked as definitely assigned
+  private gameState!: GameState;
 
   constructor(
+    public stateMachineService: StateMachineService,
     private trickService: TrickService,
-    private gameLogicService: GameLogicService,
     private playerService: PlayerService,
-    @Inject(forwardRef(() => StateMachineService)) private stateMachineService: StateMachineService // Inject StateMachineService
+    private gameLogicService: GameLogicService
   ) { }
 
   public getGameState(): GameState {
@@ -76,11 +78,11 @@ export class GameService {
   }
 
   private dealCards(): void {
-    this.gameState.players.forEach(p => p.hand = []);
+    this.gameState.players.forEach((p: Player) => p.hand = []);
 
     // Deal 3 cards to each player
     for (let i = 0; i < 3; i++) {
-      this.gameState.players.forEach(p => {
+      this.gameState.players.forEach((p: Player) => {
         this.playerService.drawCard(this.gameState, p);
       });
     }
@@ -95,46 +97,45 @@ export class GameService {
 
     // Deal 2 more cards to each player
     for (let i = 0; i < 2; i++) {
-      this.gameState.players.forEach(p => {
+      this.gameState.players.forEach((p: Player) => {
         this.playerService.drawCard(this.gameState, p);
       });
     }
 
-    this.gameState.talon = this.gameState.deck;
+    this.gameState.talon = [...this.gameState.deck];
+    this.gameState.deck = [];
   }
 
   public playCard(card: Card): void {
     if (this.gameLogicService.isValidMove(this.gameState, card)) {
-      this.gameState = this.trickService.playCard(this.gameState, card);
+      this.trickService.playCard(this.gameState, card);
 
-      // If trick just ended, draw cards
-      if (this.gameState.currentTrick.length === 0) { 
+      if (this.gameState.currentTrick.length === 0) {
         const winner = this.gameLogicService.getLastTrickWinner(this.gameState);
         if (winner) {
-          const loser = this.gameState.players.find(p => p.id !== winner.id);
+          const loser = this.gameState.players.find((p: Player) => p.id !== winner.id);
           if (loser) {
             this.playerService.drawCard(this.gameState, winner);
             this.playerService.drawCard(this.gameState, loser);
           }
         }
-        // After trick, check for hand end conditions
         const handWinner = this.gameLogicService.checkHandWinner(this.gameState);
         if (handWinner) {
-          this.stateMachineService.transitionTo('HAND_END', handWinner);
-        } else if (this.isLastTrick()) {
-          const lastTrickWinner = this.gameLogicService.getLastTrickWinner(this.gameState);
+          this.stateMachineService.transitionTo(GameStateName.HAND_END, handWinner);
+        } else if (this.isLastTrick()) { 
+          const lastTrickWinner = this.gameLogicService.getLastTrickWinner(this.gameState); 
           if (lastTrickWinner) {
-            this.stateMachineService.transitionTo('HAND_END', lastTrickWinner);
+            this.stateMachineService.transitionTo(GameStateName.HAND_END, lastTrickWinner);
           }
         } else {
-          this.stateMachineService.transitionTo('TRICK_START');
+          this.stateMachineService.transitionTo(GameStateName.TRICK_START); // Winner leads next
         }
       }
     }
   }
 
   public calculateHandResult(winner: Player): void {
-    const loser = this.gameState.players.find(p => p.id !== winner.id);
+    const loser = this.gameState.players.find((p: Player) => p.id !== winner.id);
     if (!loser) return; 
 
     let points = 1;
@@ -155,7 +156,7 @@ export class GameService {
     this.gameState.isTalonClosed = false;
     this.gameState.currentTrick = [];
     this.gameState.tricks = [];
-    this.gameState.players.forEach(p => {
+    this.gameState.players.forEach((p: Player) => {
       p.hand = [];
       p.tricks = [];
       p.score = 0;
@@ -165,12 +166,12 @@ export class GameService {
   }
 
   public exchangeTrumpJack(): void {
-    const player = this.gameState.players.find(p => p.id === this.gameState.currentPlayerId);
+    const player = this.gameState.players.find((p: Player) => p.id === this.gameState.currentPlayerId);
     if (!player) return;
 
     if (this.gameState.trumpSuit === undefined) return;
 
-    const jackIndex = player.hand.findIndex(c => c.rank === Rank.Jack && c.suit === this.gameState.trumpSuit);
+    const jackIndex = player.hand.findIndex((c: Card) => c.rank === Rank.Jack && c.suit === this.gameState.trumpSuit);
     if (jackIndex === -1) return; 
 
     if (this.gameState.talon.length === 0 || this.gameState.isTalonClosed) return; 
@@ -185,11 +186,11 @@ export class GameService {
   }
 
   public declareMarriage(marriage: { king: Card, queen: Card }): void {
-    const player = this.gameState.players.find(p => p.id === this.gameState.currentPlayerId);
+    const player = this.gameState.players[this.gameState.currentPlayerId - 1]; // Assuming currentPlayerId is 1-based
     if (!player || !player.hasWonTrick) return;
 
-    const kingIndex = player.hand.findIndex(c => c.rank === marriage.king.rank && c.suit === marriage.king.suit);
-    const queenIndex = player.hand.findIndex(c => c.rank === marriage.queen.rank && c.suit === marriage.queen.suit);
+    const kingIndex = player.hand.findIndex((c: Card) => c.rank === marriage.king.rank && c.suit === marriage.king.suit);
+    const queenIndex = player.hand.findIndex((c: Card) => c.rank === marriage.queen.rank && c.suit === marriage.queen.suit);
 
     if (kingIndex === -1 || queenIndex === -1) return; 
 
@@ -217,6 +218,6 @@ export class GameService {
   }
 
   public isLastTrick(): boolean {
-    return this.gameState.talon.length === 0 && this.gameState.players.every(p => p.hand.length === 1);
+    return this.gameState.talon.length === 0 && this.gameState.players.every((p: Player) => p.hand.length === 1);
   }
 }

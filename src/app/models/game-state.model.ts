@@ -1,4 +1,5 @@
-import { Card, Suit } from './card.model';
+import { Card } from './card.model';
+import { Suit } from './suit.enum';
 import { Player } from './player.model';
 
 export interface GameState {

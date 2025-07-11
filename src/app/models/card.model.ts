@@ -1,18 +1,6 @@
 
-export enum Suit {
-  Hearts,
-  Diamonds,
-  Clubs,
-  Spades
-}
-
-export enum Rank {
-  Ace = 'A',
-  Ten = '10',
-  King = 'K',
-  Queen = 'Q',
-  Jack = 'J'
-}
+import { Suit } from './suit.enum';
+import { Rank } from './rank.enum';
 
 export interface Card {
   suit: Suit;

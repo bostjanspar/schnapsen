@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Card, Suit } from '../models/card.model';
+import { Card } from '../models/card.model';
+import { Suit } from '../models/suit.enum';
 import { Player } from '../models/player.model';
 import { GameState } from '../models/game-state.model';
 

@@ -37,7 +37,7 @@ For Angular-specific tasks like generating components, services, or other schema
 ## Testing
 
 -   When adding new features, please include corresponding unit tests.
--   Tests are written using Jasmine and run with Karma. Test files are located next to the source files with a `.spec.ts` extension.
+-   Tests are written using Jest. Test files are located next to the source files with a `.spec.ts` extension.
 
 ## Git Workflow
 

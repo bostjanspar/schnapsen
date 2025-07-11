@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "jest"
+    "test": "jest",
+    "lint": "ng lint"
   },
   "jest": {
     "preset": "jest-preset-angular",
@@ -51,8 +52,11 @@
     "@angular/compiler-cli": "^20.0.0",
     "@angular/platform-browser-dynamic": "^20.1.0",
     "@types/jest": "^30.0.0",
+    "angular-eslint": "20.1.1",
+    "eslint": "^9.29.0",
     "jest": "^30.0.4",
     "jest-preset-angular": "^14.6.0",
-    "typescript": "~5.8.2"
+    "typescript": "~5.8.2",
+    "typescript-eslint": "8.34.1"
   }
 }
