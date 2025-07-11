@@ -14,10 +14,10 @@ import { trickEndState } from '../states/trick-end.state';
 
 export interface State {
   name: GameStateName;
-  onEntry?: (payload?: any) => void;
+  onEntry?: (payload?: unknown) => void;
   onLeave?: () => void;
-  onEvent?: (event: string, payload?: any) => void;
-  subStates?: { [key: string]: State };
+  onEvent?: (event: string, payload?: unknown) => void;
+  subStates?: Record<string, State>;
   parent?: GameStateName; // Reference to parent state for sub-states
   initialSubState?: GameStateName; // Name of the initial sub-state
 }
@@ -27,15 +27,15 @@ export interface State {
 })
 export class StateMachineService {
   private currentState: State | null = null;
-  private states: { [key: string]: State } = {};
+  private states: Record<string, State> = {};
 
-  constructor(private gameService: GameService) { }
+  gameService = inject(GameService);
 
   public addState(state: State): void {
     this.states[state.name] = state;
   }
 
-  public transitionTo(newStateName: GameStateName, payload?: any): void {
+  public transitionTo(newStateName: GameStateName, payload?: unknown): void {
     const newState = this.states[newStateName];
     if (!newState) {
       console.error(`State ${newStateName} not found.`);
@@ -59,7 +59,7 @@ export class StateMachineService {
       tempState = tempState.parent ? this.states[tempState.parent] : null;
     }
     for (const stateToEnter of entryPath) {
-      stateToEnter.onEntry?.(payload);
+      stateToEnter.onEntry?.(payload as unknown);
     }
 
     // If the new state has an initial sub-state, transition to it
@@ -68,7 +68,7 @@ export class StateMachineService {
     }
   }
 
-  public onEvent(event: string, payload?: any): void {
+  public onEvent(event: string, payload?: unknown): void {
     if (this.currentState) {
       this.currentState.onEvent?.(event, payload);
     } else {

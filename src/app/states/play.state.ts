@@ -1,8 +1,8 @@
 import { State } from '../services/state-machine.service';
-import { GameService } from '../services/game.service';
+
 import { GameStateName } from '../models/game-state-name.enum';
 
-export const playState = (gameService: GameService): State => ({
+export const playState = (): State => ({
   name: GameStateName.PLAY,
   onEntry: () => {
     console.log('Entering PLAY');

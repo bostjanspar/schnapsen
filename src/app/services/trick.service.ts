@@ -9,7 +9,7 @@ import { GameState } from '../models/game-state.model';
 })
 export class TrickService {
 
-  constructor() { }
+  
 
   public playCard(gameState: GameState, card: Card): GameState {
     const player = gameState.players.find(p => p.id === gameState.currentPlayerId);

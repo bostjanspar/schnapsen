@@ -8,7 +8,7 @@ import { Player } from '../models/player.model';
 })
 export class GameLogicService {
 
-  constructor() { }
+  
 
   public isValidMove(gameState: GameState, card: Card): boolean {
     const player = gameState.players.find(p => p.id === gameState.currentPlayerId);

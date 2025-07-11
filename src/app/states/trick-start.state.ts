@@ -9,7 +9,7 @@ export const trickStartState = (gameService: GameService): State => ({
     console.log('Entering TRICK_START');
     // Reset current trick, activate current player (handled by GameService)
   },
-  onEvent: (event: string, payload?: any) => {
+  onEvent: (event: string, payload?: unknown) => {
     switch (event) {
       case 'EXCHANGE_TRUMP_JACK':
         gameService.exchangeTrumpJack();

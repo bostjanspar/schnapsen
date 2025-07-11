@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Deck } from '../models/deck.model';
+
 import { Card } from '../models/card.model';
 import { Player } from '../models/player.model';
 import { StateMachineService } from './state-machine.service';
@@ -17,12 +17,10 @@ import { GameLogicService } from './game-logic.service';
 export class GameService {
   private gameState!: GameState;
 
-  constructor(
-    public stateMachineService: StateMachineService,
-    private trickService: TrickService,
-    private playerService: PlayerService,
-    private gameLogicService: GameLogicService
-  ) { }
+  stateMachineService = inject(StateMachineService);
+  private trickService = inject(TrickService);
+  private playerService = inject(PlayerService);
+  private gameLogicService = inject(GameLogicService);
 
   public getGameState(): GameState {
     return this.gameState;
@@ -61,7 +59,7 @@ export class GameService {
       [Rank.Jack]: 2
     };
 
-    let deck: Card[] = [];
+    const deck: Card[] = [];
     for (const suit of suits) {
       for (const rank of ranks) {
         deck.push({ suit, rank, value: values[rank] });
