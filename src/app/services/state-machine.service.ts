@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { GameService } from './game.service';
 import { GameStateName } from '../models/game-state-name.enum';
 import { preGameState } from '../states/pre-game.state';
@@ -86,8 +86,8 @@ export class StateMachineService {
   }
 
   private addStates(): void {
-    const play = playState(this.gameService);
-    const handPlay = handPlayState(this.gameService);
+    const play = playState();
+    const handPlay = handPlayState();
 
     this.addState(preGameState(this.gameService));
     this.addState(newGameState(this.gameService));

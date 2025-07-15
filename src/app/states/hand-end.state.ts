@@ -5,7 +5,8 @@ import { Player } from '../models/player.model';
 
 export const handEndState = (gameService: GameService): State => ({
   name: GameStateName.HAND_END,
-  onEntry: (winner: Player) => {
+  onEntry: (payload?: unknown) => {
+    const winner = payload as Player;
     console.log('Entering HAND_END');
     gameService.calculateHandResult(winner);
 

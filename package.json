@@ -43,7 +43,9 @@
     "@angular/forms": "^20.0.0",
     "@angular/platform-browser": "^20.0.0",
     "@angular/router": "^20.0.0",
+    "gsap": "^3.13.0",
     "rxjs": "~7.8.0",
+    "three": "^0.178.0",
     "tslib": "^2.3.0"
   },
   "devDependencies": {
@@ -52,6 +54,7 @@
     "@angular/compiler-cli": "^20.0.0",
     "@angular/platform-browser-dynamic": "^20.1.0",
     "@types/jest": "^30.0.0",
+    "@types/three": "^0.178.1",
     "angular-eslint": "20.1.1",
     "eslint": "^9.29.0",
     "jest": "^30.0.4",

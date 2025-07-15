@@ -9,7 +9,7 @@ export const trickInProgressState = (gameService: GameService): State => ({
     console.log('Entering TRICK_IN_PROGRESS');
   },
   onEvent: (event: string, payload?: unknown) => {
-    if (event === 'PLAY_CARD') {
+    if (event === 'PLAY_CARD' && payload && typeof payload === 'object' && 'card' in payload) {
       gameService.playCard(payload.card as Card);
       // After playing the second card, the trick is over, so transition to TRICK_END
       gameService.stateMachineService.transitionTo(GameStateName.TRICK_END);

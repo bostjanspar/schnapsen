@@ -15,14 +15,18 @@ export const trickStartState = (gameService: GameService): State => ({
         gameService.exchangeTrumpJack();
         break;
       case 'DECLARE_MARRIAGE':
-        gameService.declareMarriage(payload.marriage);
+        if (payload && typeof payload === 'object' && 'marriage' in payload) {
+          gameService.declareMarriage(payload.marriage as { king: Card, queen: Card });
+        }
         break;
       case 'CLOSE_TALON':
         gameService.closeTalon();
         break;
       case 'LEAD_CARD':
-        gameService.playCard(payload.card as Card);
-        gameService.stateMachineService.transitionTo(GameStateName.TRICK_IN_PROGRESS);
+        if (payload && typeof payload === 'object' && 'card' in payload) {
+          gameService.playCard(payload.card as Card);
+          gameService.stateMachineService.transitionTo(GameStateName.TRICK_IN_PROGRESS);
+        }
         break;
     }
   },
