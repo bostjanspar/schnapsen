@@ -36,7 +36,7 @@ Phase 1: Angular Foundation - **COMPLETED**
 ## Phase 3: Card System
 ### Task 3.1: Card Mesh Management
 - [x] CardMeshFactory: Card geometry creation
-- [x] CardMaterialManager: Card materials and textures
+- [ ] CardMaterialManager: Card materials and textures (Deferred: SVG loading issues)
 - [x] CardRenderer: Individual card display
 
 ### Task 3.2: Card Collections
@@ -45,6 +45,11 @@ Phase 1: Angular Foundation - **COMPLETED**
 - [x] TrickRenderer: Trick area visualization
 
 Phase 3: Card System - **COMPLETED**
+
+**Card Asset Cleanup:**
+- [x] Moved necessary card SVG files to `src/assets/`.
+- [x] Removed unnecessary card SVG files from `src/app/SVG-cards-1.3/`.
+- [x] Updated `angular.json` to reflect asset changes.
 
 Phase 3: Card System - **COMPLETED**
 
