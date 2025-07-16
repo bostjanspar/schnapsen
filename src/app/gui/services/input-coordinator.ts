@@ -1,9 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import * as THREE from 'three';
-import { CardClickHandler } from './gui/services/card-click-handler';
-import { CardHoverHandler } from './gui/services/card-hover-handler';
-import { CardDragHandler } from './gui/services/card-drag-handler';
-import { ButtonInteractionHandler } from './gui/services/button-interaction-handler';
+import { CardClickHandler } from './card-click-handler';
+import { CardHoverHandler } from './card-hover-handler';
+import { CardDragHandler } from './card-drag-handler';
+import { ButtonInteractionHandler } from './button-interaction-handler';
 
 @Injectable({
   providedIn: 'root'

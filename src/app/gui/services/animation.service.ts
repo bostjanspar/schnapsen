@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import * as THREE from 'three';
 import { TweenService } from './tween-service';
 import { CardRenderer } from './card-renderer';
-import { Card } from './models/card.model';
+import { Card } from '../../logic/models/card.model';
 
 @Injectable({
   providedIn: 'root'

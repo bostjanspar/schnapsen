@@ -1,20 +1,20 @@
 import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, inject } from '@angular/core';
 import * as THREE from 'three';
-import { SceneManager } from '../scene-manager';
-import { CameraController } from '../camera-controller';
-import { LightingSetup } from '../lighting-setup';
-import { TableRenderer } from '../table-renderer';
-import { BackgroundRenderer } from '../background-renderer';
-import { LayoutManager } from '../layout-manager';
-import { CardRenderer } from '../card-renderer';
-import { HandRenderer } from '../hand-renderer';
-import { TalonRenderer } from '../talon-renderer';
-import { TrickRenderer } from '../trick-renderer';
-import { AnimationService } from '../animation.service';
-import { InputCoordinator } from '../input-coordinator';
-import { Card } from '../models/card.model';
-import { Rank } from '../models/rank.enum';
-import { Suit } from '../models/suit.enum';
+import { SceneManager } from '../services/scene-manager';
+import { CameraController } from '../services/camera-controller';
+import { LightingSetup } from '../services/lighting-setup';
+import { TableRenderer } from '../services/table-renderer';
+import { BackgroundRenderer } from '../services/background-renderer';
+import { LayoutManager } from '../services/layout-manager';
+import { CardRenderer } from '../services/card-renderer';
+import { HandRenderer } from '../services/hand-renderer';
+import { TalonRenderer } from '../services/talon-renderer';
+import { TrickRenderer } from '../services/trick-renderer';
+import { AnimationService } from '../services/animation.service';
+import { InputCoordinator } from '../services/input-coordinator';
+import { Card } from '../../logic/models/card.model';
+import { Rank } from '../../logic/models/rank.enum';
+import { Suit } from '../../logic/models/suit.enum';
 
 @Component({
   selector: 'app-three-js',

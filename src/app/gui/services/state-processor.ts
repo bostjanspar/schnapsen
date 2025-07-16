@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { StateListener } from './state-listener';
-import { AnimationService } from './gui/services/animation.service';
+import { StateListener } from '../../state-listener';
+import { AnimationService } from './animation.service';
 
 @Injectable({
   providedIn: 'root'
