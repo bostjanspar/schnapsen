@@ -1,1 +1,5 @@
-<p>action-buttons works!</p>
+<div class="action-buttons-container">
+  <button *ngFor="let action of availableActions" (click)="onActionClick(action)">
+    {{ action }}
+  </button>
+</div>

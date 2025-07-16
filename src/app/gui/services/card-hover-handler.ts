@@ -1,14 +1,14 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import * as THREE from 'three';
+import { AnimationService } from './animation.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CardHoverHandler {
   private intersectedObject: THREE.Object3D | null = null;
+  private animationService = inject(AnimationService);
 
-  // Placeholder for hover handling logic
-  // This would typically involve raycasting to detect hovers on 3D objects
   handleHover(event: MouseEvent, camera: THREE.Camera, scene: THREE.Scene): THREE.Object3D | null {
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
@@ -21,17 +21,19 @@ export class CardHoverHandler {
     const intersects = raycaster.intersectObjects(scene.children, true);
 
     if (intersects.length > 0) {
-      if (this.intersectedObject !== intersects[0].object) {
-        // New object hovered
-        this.intersectedObject = intersects[0].object;
+      const newIntersected = intersects[0].object;
+      if (this.intersectedObject !== newIntersected) {
+        if (this.intersectedObject) {
+          this.animationService.unhighlightCard(this.intersectedObject as THREE.Mesh); // Unhighlight previous
+        }
+        this.intersectedObject = newIntersected;
+        this.animationService.highlightCard(this.intersectedObject as THREE.Mesh); // Highlight new
         return this.intersectedObject;
       }
     } else {
       if (this.intersectedObject) {
-        // Hover ended
-        const prevIntersected = this.intersectedObject;
+        this.animationService.unhighlightCard(this.intersectedObject as THREE.Mesh); // Unhighlight current
         this.intersectedObject = null;
-        return prevIntersected; // Return the previously hovered object to unhighlight it
       }
     }
     return null;

@@ -14,16 +14,16 @@ export class TalonRenderer {
 
     // Render talon stack
     for (let i = 0; i < talonCards.length; i++) {
-      const cardMesh = await this.cardRenderer.renderCard(talonCards[i], false); // Face down
-      cardMesh.position.y = i * 0.05; // Stack cards with slight offset
+      const cardMesh = await this.cardRenderer.renderCard(talonCards[i], false, false, false, true); // Render all talon cards as question marks
+      cardMesh.position.y = i * 0.05; // Tighter stack
       talonGroup.add(cardMesh);
     }
 
     // Render trump card
     if (trumpCard) {
-      const trumpMesh = await this.cardRenderer.renderCard(trumpCard, true);
-      trumpMesh.position.set(0, talonCards.length * 0.05 + 0.1, 0); // Position above talon
-      trumpMesh.rotation.z = Math.PI / 2; // Rotate to show trump suit
+      const trumpMesh = await this.cardRenderer.renderCard(trumpCard, true, true, false, false);
+      // Position trump card next to the talon stack, slightly overlapping
+      trumpMesh.position.set(2.5, (talonCards.length - 1) * 0.05 / 2, 0);
       talonGroup.add(trumpMesh);
     }
 

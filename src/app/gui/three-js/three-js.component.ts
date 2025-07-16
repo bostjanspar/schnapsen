@@ -23,7 +23,7 @@ import { Suit } from '../../logic/models/suit.enum';
   styleUrl: './three-js.component.css'
 })
 export class ThreeJSComponent implements AfterViewInit, OnDestroy {
-  @ViewChild('rendererCanvas')
+  @ViewChild('rendererCanvas', { static: true })
   private rendererCanvas!: ElementRef<HTMLCanvasElement>;
 
   private sceneManager = inject(SceneManager);
@@ -53,30 +53,47 @@ export class ThreeJSComponent implements AfterViewInit, OnDestroy {
     this.scene.add(this.tableRenderer.createTable());
     this.scene.add(this.backgroundRenderer.createBackground());
 
-    // Add a sample card
-    const sampleCard: Card = { suit: Suit.Spades, rank: Rank.Ace, value: 11 };
-    const cardMesh = await this.cardRenderer.renderCard(sampleCard);
-    cardMesh.position.set(0, 0, 0);
-    this.scene.add(cardMesh);
-
-    // Add sample hand
-    const sampleHand: Card[] = [
+    // Add sample player hand
+    const playerHand: Card[] = [
       { suit: Suit.Hearts, rank: Rank.King, value: 4 },
       { suit: Suit.Diamonds, rank: Rank.Ten, value: 10 },
-      { suit: Suit.Clubs, rank: Rank.Jack, value: 2 }
+      { suit: Suit.Clubs, rank: Rank.Jack, value: 2 },
+      { suit: Suit.Spades, rank: Rank.Ace, value: 11 },
+      { suit: Suit.Hearts, rank: Rank.Queen, value: 3 }
     ];
-    const handGroup = await this.handRenderer.renderHand(sampleHand);
-    handGroup.position.set(-1, -2, 0);
-    this.scene.add(handGroup);
+    const playerHandGroup = await this.handRenderer.renderHand(playerHand);
+    playerHandGroup.position.set(0, -4, 2); // Position at bottom center
+    this.scene.add(playerHandGroup);
+
+    // Add sample opponent hand
+    const opponentHand: Card[] = [
+      { suit: Suit.Clubs, rank: Rank.King, value: 4 },
+      { suit: Suit.Spades, rank: Rank.Ten, value: 10 },
+      { suit: Suit.Hearts, rank: Rank.Jack, value: 2 },
+      { suit: Suit.Diamonds, rank: Rank.Ace, value: 11 },
+      { suit: Suit.Clubs, rank: Rank.Queen, value: 3 }
+    ];
+    const opponentHandGroup = await this.handRenderer.renderHand(opponentHand, true); // Render opponent hand with question marks
+    opponentHandGroup.position.set(0, 4.5, -4); // Position at top center
+    opponentHandGroup.rotation.y = Math.PI; // Rotate to face away from player
+    this.scene.add(opponentHandGroup);
 
     // Add sample talon
     const sampleTalon: Card[] = [
       { suit: Suit.Spades, rank: Rank.Queen, value: 3 },
-      { suit: Suit.Hearts, rank: Rank.Ten, value: 10 }
+      { suit: Suit.Hearts, rank: Rank.Ten, value: 10 },
+      { suit: Suit.Clubs, rank: Rank.King, value: 4 },
+      { suit: Suit.Diamonds, rank: Rank.Jack, value: 2 },
+      { suit: Suit.Hearts, rank: Rank.Ace, value: 11 },
+      { suit: Suit.Spades, rank: Rank.King, value: 4 },
+      { suit: Suit.Clubs, rank: Rank.Ten, value: 10 },
+      { suit: Suit.Diamonds, rank: Rank.Queen, value: 3 },
+      { suit: Suit.Hearts, rank: Rank.Jack, value: 2 },
+      { suit: Suit.Spades, rank: Rank.Ace, value: 11 }
     ];
     const sampleTrump: Card = { suit: Suit.Diamonds, rank: Rank.Ace, value: 11 };
     const talonGroup = await this.talonRenderer.renderTalon(sampleTalon, sampleTrump, false);
-    talonGroup.position.set(2, 0, 0);
+    talonGroup.position.set(-5, 0, 0); // Position at center-left
     this.scene.add(talonGroup);
 
     // Add sample trick
@@ -85,8 +102,26 @@ export class ThreeJSComponent implements AfterViewInit, OnDestroy {
       { suit: Suit.Diamonds, rank: Rank.Jack, value: 2 }
     ];
     const trickGroup = await this.trickRenderer.renderTrick(sampleTrick);
-    trickGroup.position.set(0, 1, 0);
+    trickGroup.position.set(0, 0, 0); // Position at center
     this.scene.add(trickGroup);
+
+    // Add sample player trick pile
+    const playerTrickPile: Card[] = [
+      { suit: Suit.Spades, rank: Rank.Ten, value: 10 },
+      { suit: Suit.Hearts, rank: Rank.King, value: 4 }
+    ];
+    const playerTrickPileGroup = await this.trickRenderer.renderTrick(playerTrickPile, true);
+    playerTrickPileGroup.position.set(5, -2, 0); // Position at bottom-right
+    this.scene.add(playerTrickPileGroup);
+
+    // Add sample opponent trick pile
+    const opponentTrickPile: Card[] = [
+      { suit: Suit.Diamonds, rank: Rank.Ten, value: 10 },
+      { suit: Suit.Clubs, rank: Rank.King, value: 4 }
+    ];
+    const opponentTrickPileGroup = await this.trickRenderer.renderTrick(opponentTrickPile, true);
+    opponentTrickPileGroup.position.set(5, 2, 0); // Position at top-right
+    this.scene.add(opponentTrickPileGroup);
 
     this.inputCoordinator.init(this.rendererCanvas.nativeElement, this.camera, this.scene);
 

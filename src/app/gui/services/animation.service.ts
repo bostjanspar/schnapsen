@@ -37,7 +37,7 @@ export class AnimationService {
 
   // CardDealAnimation methods
   async dealCard(card: Card, startPosition: THREE.Vector3, targetPosition: THREE.Vector3, scene: THREE.Scene, duration: number = 0.5): Promise<THREE.Mesh> {
-    const cardMesh = await this.cardRenderer.renderCard(card, false); // Deal face down
+    const cardMesh = await this.cardRenderer.renderCard(card, false, false, false, false); // Deal face down
     cardMesh.position.copy(startPosition);
     scene.add(cardMesh);
 
