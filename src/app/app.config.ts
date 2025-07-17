@@ -7,6 +7,8 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes)
+    provideRouter(routes),
+    // ThreeService, - not needed since providedIn: 'root'
+
   ]
 };
