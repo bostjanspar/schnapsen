@@ -5,7 +5,23 @@ import { ThreeService } from '../services/three.service';
   selector: 'app-three-scene',
   template: '<div #threeContainer style="width: 100%; height: 100vh; overflow: hidden;"></div>',
   standalone: true,
-  styleUrls: ['three-scene.css']
+  styles: [`
+    :host {
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      z-index: 1;
+    }
+    .three-fullscreen {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+  `]
 })
 export class ThreeSceneComponent implements OnInit {
   @ViewChild('threeContainer', { static: true }) containerRef!: ElementRef;

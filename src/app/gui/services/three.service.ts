@@ -17,12 +17,14 @@ export class ThreeService {
   public init(container: HTMLElement) {
     // Renderer
     this.renderer = new THREE.WebGLRenderer();
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    const width = Math.max(window.innerWidth, 600);
+    const height = Math.max(window.innerHeight, 600);
+    this.renderer.setSize(width, height);
     this.renderer.setPixelRatio(window.devicePixelRatio);
     container.appendChild(this.renderer.domElement);
 
     // Camera
-    this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    this.camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
     this.camera.position.z = 5;
 
     this.createStartupScene();
@@ -55,6 +57,13 @@ export class ThreeService {
     const geometry = new THREE.BoxGeometry();
     const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
     const cube = new THREE.Mesh(geometry, material);
+
+    // Move the cube to the top right of the visible area
+    // Assuming camera is at z=5, looking at origin, and default FOV
+    // Move cube to (x: right, y: top)
+    cube.position.x = -3; // adjust as needed
+    cube.position.y = 2; // adjust as needed
+
     this.gameScene.add(cube);
   }
 
@@ -77,8 +86,8 @@ export class ThreeService {
   }
 
   private onResize = () => {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+    const width = Math.max(window.innerWidth, 600);
+    const height = Math.max(window.innerHeight, 600);
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
