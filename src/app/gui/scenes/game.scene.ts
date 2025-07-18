@@ -46,6 +46,8 @@ export interface CardPosition {
   faceUp: boolean;
 }
 
+const player_Y: number = -2.5;
+
 export class GameScene extends BaseScene {
   private raycaster = new THREE.Raycaster();
   private cardGeometry!: THREE.BoxGeometry;
@@ -63,6 +65,8 @@ export class GameScene extends BaseScene {
   private currentTrickGroup: THREE.Group = new THREE.Group();
   private playerTricksGroup: THREE.Group = new THREE.Group();
   private opponentTricksGroup: THREE.Group = new THREE.Group();
+
+ 
 
   constructor() {
     super();
@@ -201,7 +205,7 @@ export class GameScene extends BaseScene {
     for (let i = 0; i < 5; i++) {
       const card = this.deck[i];
       const cardMesh = this.createCardMesh(card, true);
-      cardMesh.position.set((i - 2) * (CARD_WIDTH + 0.1), -2.5, 0);
+      cardMesh.position.set((i - 2) * (CARD_WIDTH + 0.1), player_Y, 0);
       cardMesh.name = `playerCard_${i}`;
       this.playerHandGroup.add(cardMesh);
       this.cardMeshes.set(`playerCard_${i}`, cardMesh);
@@ -375,10 +379,10 @@ export class GameScene extends BaseScene {
   private onCardClick(cardMesh: THREE.Mesh): void {
     // Example: highlight selected card
     if (cardMesh.userData['selected']) {
-      cardMesh.position.y = 0;
+      cardMesh.position.y = player_Y;
       cardMesh.userData['selected'] = false;
     } else {
-      cardMesh.position.y = 0.3;
+      cardMesh.position.y = player_Y+0.3;
       cardMesh.userData['selected'] = true;
     }
   }
@@ -390,7 +394,7 @@ export class GameScene extends BaseScene {
       if (group instanceof THREE.Group) {
         group.children.forEach(child => {
           if (child.userData['selected']) {
-            child.position.y = 0.3 + Math.sin(Date.now() * 0.003) * 0.1;
+            child.position.y = (player_Y+0.3) + Math.sin(Date.now() * 0.003) * 0.1;
           }
         });
       }
