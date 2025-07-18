@@ -179,11 +179,12 @@ export class GameScene extends BaseScene {
 
   private setupTable(): void {
     // Table surface
-    const tableGeometry = new THREE.CircleGeometry(8, 32);
+    const tableGeometry = new THREE.CircleGeometry(12, 64);
     const tableMaterial = this.cardMaterials.get('table')!;
     const table = new THREE.Mesh(tableGeometry, tableMaterial);
-    table.rotation.x = -Math.PI / 2;
+    //table.rotation.x = -Math.PI / 2;
     table.position.y = -0.1;
+    table.position.z = -5;
     table.name = 'table';
     this.add(table);
   }
@@ -200,7 +201,7 @@ export class GameScene extends BaseScene {
     for (let i = 0; i < 5; i++) {
       const card = this.deck[i];
       const cardMesh = this.createCardMesh(card, true);
-      cardMesh.position.set((i - 2) * (CARD_WIDTH + 0.1), 0, -5);
+      cardMesh.position.set((i - 2) * (CARD_WIDTH + 0.1), -2.5, 0);
       cardMesh.name = `playerCard_${i}`;
       this.playerHandGroup.add(cardMesh);
       this.cardMeshes.set(`playerCard_${i}`, cardMesh);
@@ -210,7 +211,7 @@ export class GameScene extends BaseScene {
     for (let i = 0; i < 5; i++) {
       const card = this.deck[i + 5];
       const cardMesh = this.createCardMesh(card, false);
-      cardMesh.position.set((i - 2) * (CARD_WIDTH + 0.1), 0, 5);
+      cardMesh.position.set((i - 2) * (CARD_WIDTH + 0.1), 4, -2);
       cardMesh.rotation.y = Math.PI;
       cardMesh.name = `opponentCard_${i}`;
       this.opponentHandGroup.add(cardMesh);
@@ -222,7 +223,8 @@ export class GameScene extends BaseScene {
     // Trump card (face up) - 11th card
     const trumpCard = this.deck[10];
     const trumpCardMesh = this.createCardMesh(trumpCard, true);
-    trumpCardMesh.position.set(-3, 0, 0);
+    trumpCardMesh.rotation.z = -Math.PI / 2;
+    trumpCardMesh.position.set(-2, 0, 0);
     trumpCardMesh.name = 'trumpCard';
     this.talonGroup.add(trumpCardMesh);
     this.cardMeshes.set('trumpCard', trumpCardMesh);

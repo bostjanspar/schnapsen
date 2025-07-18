@@ -40,7 +40,7 @@ export class ThreeService {
 
     this.setupLighting();
 
-    this.setActiveScene(SchnapsenScene.Startup);
+    this.setActiveScene(SchnapsenScene.Game);
 
     this.animate();
 
