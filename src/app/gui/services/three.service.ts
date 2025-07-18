@@ -17,7 +17,7 @@ export class ThreeService {
 
   constructor() { }
 
-  public init(container: HTMLElement) {
+  public async init(container: HTMLElement) {
     // Renderer
     this.renderer = new THREE.WebGLRenderer();
     const width = Math.max(window.innerWidth, 600);
@@ -31,8 +31,11 @@ export class ThreeService {
     this.camera.position.z = 5;
 
     // Scenes
+    const gameScene = new GameScene();
+    await gameScene.initialize();
+
     this.scenes.set(SchnapsenScene.Startup, new StartupScene(() => this.setActiveScene(SchnapsenScene.Game)));
-    this.scenes.set(SchnapsenScene.Game, new GameScene());
+    this.scenes.set(SchnapsenScene.Game, gameScene);
     this.scenes.forEach(scene => scene.camera = this.camera);
 
     this.setActiveScene(SchnapsenScene.Startup);

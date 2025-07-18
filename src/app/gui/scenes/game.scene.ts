@@ -68,10 +68,12 @@ export class GameScene extends BaseScene {
     super();
     this.background = new THREE.Color(0x1a4a3a); // Dark green table color
     this.allowMouseEvent = true;
-    
+  }
+
+  public async initialize() {
     this.cardMeshes = new Map();
     this.setupGeometry();
-    this.setupMaterials();
+    await this.setupMaterials();
     this.initializeDeck();
     this.createCardGroups();
     this.setupTable();
@@ -82,94 +84,45 @@ export class GameScene extends BaseScene {
     this.cardGeometry = new THREE.BoxGeometry(CARD_WIDTH, CARD_HEIGHT, CARD_THICKNESS);
   }
 
-  private setupMaterials(): void {
+  private async setupMaterials(): Promise<void> {
     this.cardMaterials = new Map();
+    const textureLoader = new THREE.TextureLoader();
 
-    // Create textures for card faces
+    // Create card back material
     const canvas = document.createElement('canvas');
     canvas.width = 256;
     canvas.height = 356;
     const ctx = canvas.getContext('2d')!;
-
-    // Card back material
     ctx.fillStyle = '#1a237e';
     ctx.fillRect(0, 0, 256, 356);
     ctx.fillStyle = '#ffffff';
     ctx.font = '20px Arial';
     ctx.textAlign = 'center';
     ctx.fillText('SCHNAPSEN', 128, 180);
-    
     const cardBackTexture = new THREE.CanvasTexture(canvas);
     const cardBackMaterial = new THREE.MeshLambertMaterial({ map: cardBackTexture });
     this.cardMaterials.set('back', cardBackMaterial);
 
-    // Create materials for each card
-    Object.values(Suit).forEach(suit => {
-      Object.values(Rank).forEach(rank => {
+    // Load card face textures
+    const cardFaces = [];
+    for (const suit of Object.values(Suit)) {
+      for (const rank of Object.values(Rank)) {
         const cardId = `${suit}_${rank}`;
-        const material = this.createCardFaceMaterial(suit, rank);
-        this.cardMaterials.set(cardId, material);
-      });
-    });
+        const path = `/assets/cards/${suit}_${rank}.svg`;
+        cardFaces.push(new Promise((resolve) => {
+          textureLoader.load(path, (texture) => {
+            this.cardMaterials.set(cardId, new THREE.MeshLambertMaterial({ map: texture }));
+            resolve(null);
+          });
+        }));
+      }
+    }
+
+    await Promise.all(cardFaces);
 
     // Table material
     const tableMaterial = new THREE.MeshLambertMaterial({ color: 0x2d5a3d });
     this.cardMaterials.set('table', tableMaterial);
-  }
-
-  private createCardFaceMaterial(suit: Suit, rank: Rank): THREE.MeshLambertMaterial {
-    const canvas = document.createElement('canvas');
-    canvas.width = 256;
-    canvas.height = 356;
-    const ctx = canvas.getContext('2d')!;
-
-    // Card background
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, 256, 356);
-    ctx.strokeStyle = '#000000';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(5, 5, 246, 346);
-
-    // Card suit color
-    const isRed = suit === Suit.HEARTS || suit === Suit.DIAMONDS;
-    ctx.fillStyle = isRed ? '#ff0000' : '#000000';
-
-    // Draw rank
-    ctx.font = 'bold 40px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText(this.getRankSymbol(rank), 128, 60);
-
-    // Draw suit symbol
-    ctx.font = '60px Arial';
-    ctx.fillText(this.getSuitSymbol(suit), 128, 180);
-
-    // Draw point value
-    ctx.font = '24px Arial';
-    ctx.fillText(`${CARD_VALUES[rank]}`, 128, 320);
-
-    const texture = new THREE.CanvasTexture(canvas);
-    return new THREE.MeshLambertMaterial({ map: texture });
-  }
-
-  private getRankSymbol(rank: Rank): string {
-    const symbols = {
-      [Rank.ACE]: 'A',
-      [Rank.TEN]: '10',
-      [Rank.KING]: 'K',
-      [Rank.QUEEN]: 'Q',
-      [Rank.JACK]: 'J'
-    };
-    return symbols[rank];
-  }
-
-  private getSuitSymbol(suit: Suit): string {
-    const symbols = {
-      [Suit.HEARTS]: '♥',
-      [Suit.DIAMONDS]: '♦',
-      [Suit.CLUBS]: '♣',
-      [Suit.SPADES]: '♠'
-    };
-    return symbols[suit];
   }
 
   private initializeDeck(): void {
