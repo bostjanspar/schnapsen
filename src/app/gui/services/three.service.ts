@@ -38,6 +38,8 @@ export class ThreeService {
     this.scenes.set(SchnapsenScene.Game, gameScene);
     this.scenes.forEach(scene => scene.camera = this.camera);
 
+    this.setupLighting();
+
     this.setActiveScene(SchnapsenScene.Startup);
 
     this.animate();
@@ -47,6 +49,17 @@ export class ThreeService {
 
   public setActiveScene(scene: SchnapsenScene) {
     this.activeScene = this.scenes.get(scene)!;
+  }
+
+  private setupLighting() {
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    directionalLight.position.set(0, 1, 1);
+
+    this.scenes.forEach(scene => {
+      scene.add(ambientLight.clone());
+      scene.add(directionalLight.clone());
+    });
   }
 
   private animate = () => {

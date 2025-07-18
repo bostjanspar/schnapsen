@@ -120,6 +120,8 @@ export class GameScene extends BaseScene {
 
     await Promise.all(cardFaces);
 
+    console.log('Card materials:', this.cardMaterials);
+
     // Table material
     const tableMaterial = new THREE.MeshLambertMaterial({ color: 0x2d5a3d });
     this.cardMaterials.set('table', tableMaterial);
@@ -264,6 +266,7 @@ export class GameScene extends BaseScene {
   }
 
   private createCardMesh(card: Card, faceUp: boolean): THREE.Mesh {
+    console.log('Applying material:', this.cardMaterials.get(card.id));
     const materials = [
       this.cardMaterials.get('back')!, // Right
       this.cardMaterials.get('back')!, // Left  
