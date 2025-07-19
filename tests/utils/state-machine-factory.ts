@@ -6,17 +6,17 @@ import { TestStateA, TestStateB, TestStateC, TestParentState } from '@test/fixtu
 export class TestStateMachineFactory {
   static createSimpleMachine(): StateMachine {
     const machine = new StateMachine();
-    machine.addState(new TestStateA(StateEnum.TEST_STATE_A));
-    machine.addState(new TestStateB(StateEnum.TEST_STATE_B));
-    machine.addState(new TestStateC(StateEnum.TEST_STATE_C));
+    machine.addState(new TestStateA(StateEnum.UNIT_TEST_STATE_A));
+    machine.addState(new TestStateB(StateEnum.UNIT_TEST_STATE_B));
+    machine.addState(new TestStateC(StateEnum.UNIT_TEST_STATE_C));
     return machine;
   }
 
   static createHierarchicalMachine(): StateMachine {
     const machine = new StateMachine();
-    const parent = new TestParentState(StateEnum.PARENT);
-    const childA = new TestStateA(StateEnum.CHILD_A);
-    const childB = new TestStateB(StateEnum.CHILD_B);
+    const parent = new TestParentState(StateEnum.UNIT_TEST_PARENT);
+    const childA = new TestStateA(StateEnum.UNIT_TEST_CHILD_A);
+    const childB = new TestStateB(StateEnum.UNIT_TEST_CHILD_B);
 
     parent.addSubstate(childA);
     parent.addSubstate(childB);
@@ -28,9 +28,9 @@ export class TestStateMachineFactory {
 
   static createMultiLevelMachine(): StateMachine {
     const machine = new StateMachine();
-    const parent = new TestParentState(StateEnum.PARENT);
-    const childA = new TestStateA(StateEnum.CHILD_A);
-    const grandChild = new TestStateC(StateEnum.GRANDCHILD);
+    const parent = new TestParentState(StateEnum.UNIT_TEST_PARENT);
+    const childA = new TestStateA(StateEnum.UNIT_TEST_CHILD_A);
+    const grandChild = new TestStateC(StateEnum.UNIT_TEST_GRANDCHILD);
 
     childA.addSubstate(grandChild);
     parent.addSubstate(childA);

@@ -8,6 +8,7 @@ export class TestStateA extends BaseState {
   public eventCallCount = 0;
   public lastEvent: EventEnum | null = null;
 
+
   constructor(id: StateEnum) {
     super(id);
   }

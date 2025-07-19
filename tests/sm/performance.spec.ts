@@ -26,8 +26,8 @@ describe('Performance Tests', () => {
     // This test will simulate rapid transitions to catch obvious performance degradation,
     // which can be a sign of memory issues.
     const machine = new StateMachine();
-    const stateA = new TestStateA(StateEnum.TEST_STATE_A);
-    const stateB = new TestStateA(StateEnum.TEST_STATE_B);
+    const stateA = new TestStateA(StateEnum.UNIT_TEST_STATE_A);
+    const stateB = new TestStateA(StateEnum.UNIT_TEST_STATE_B);
 
     machine.addState(stateA);
     machine.addState(stateB);
@@ -37,7 +37,7 @@ describe('Performance Tests', () => {
     const startTime = performance.now();
 
     for (let i = 0; i < transitionCount; i++) {
-        machine.transition(i % 2 === 0 ? StateEnum.TEST_STATE_B : StateEnum.TEST_STATE_A);
+        machine.transition(i % 2 === 0 ? StateEnum.UNIT_TEST_STATE_B : StateEnum.UNIT_TEST_STATE_A);
     }
     
     const endTime = performance.now();
