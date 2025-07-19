@@ -1,1 +1,9 @@
-export enum StateEnum {}
+export enum StateEnum {
+  TEST_STATE_A,
+  TEST_STATE_B,
+  TEST_STATE_C,
+  PARENT,
+  CHILD_A,
+  CHILD_B,
+  GRANDCHILD,
+}

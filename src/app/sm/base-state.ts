@@ -13,6 +13,15 @@ export abstract class BaseState {
     if (this.children.has(childState.id)) {
       throw new Error(`State with ID ${StateEnum[childState.id]} already exists as a substate.`);
     }
+    
+    let current: BaseState | null = this;
+    while (current) {
+        if (current === childState) {
+            throw new Error('Circular reference detected: a state cannot be its own ancestor.');
+        }
+        current = current.parent;
+    }
+
     childState.parent = this;
     this.children.set(childState.id, childState);
   }

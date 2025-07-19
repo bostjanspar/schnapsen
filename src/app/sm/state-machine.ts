@@ -56,8 +56,15 @@ export class StateMachine {
       return false;
     }
 
+    let activeState: BaseState | null = this.currentState;
+    // @ts-ignore
+    while (activeState && activeState.activeSubstate) {
+        // @ts-ignore
+      activeState = activeState.activeSubstate;
+    }
+
     // Hierarchical event handling from leaf to root
-    let state: BaseState | null = this.currentState;
+    let state: BaseState | null = activeState;
     while (state) {
       if (state.onEvent(event, ...args)) {
         return true; // Event consumed
