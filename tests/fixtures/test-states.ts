@@ -23,7 +23,7 @@ export class TestStateA extends BaseState {
   onEvent(event: EventEnum): boolean {
     this.eventCallCount++;
     this.lastEvent = event;
-    return event === EventEnum.CONSUME_EVENT;
+    return event === EventEnum.UNIT_TEST_CONSUME_EVENT;
   }
 
   cleanup() {

@@ -11,8 +11,8 @@ describe('Critical Scenarios', () => {
 
   describe('State Registration Edge Cases', () => {
     test('should prevent circular parent-child references', () => {
-        const parent = new TestParentState(StateEnum.PARENT);
-        const child = new TestStateA(StateEnum.CHILD_A);
+        const parent = new TestParentState(StateEnum.UNIT_TEST_PARENT);
+        const child = new TestStateA(StateEnum.UNIT_TEST_CHILD_A);
         
         parent.addSubstate(child);
 
@@ -24,33 +24,33 @@ describe('Critical Scenarios', () => {
   describe('Transition Edge Cases', () => {
     test('should handle transition to non-existent state gracefully', () => {
       const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
-      const result = stateMachine.transition(StateEnum.TEST_STATE_A);
+      const result = stateMachine.transition(StateEnum.UNIT_TEST_STATE_A);
       expect(result).toBe(false);
-      expect(consoleWarnSpy).toHaveBeenCalledWith('Target state TEST_STATE_A not found in this state machine.');
+      expect(consoleWarnSpy).toHaveBeenCalledWith('Target state UNIT_TEST_STATE_A not found in this state machine.');
       consoleWarnSpy.mockRestore();
     });
 
     test('should handle self-transition', () => {
-        const stateA = new TestStateA(StateEnum.TEST_STATE_A);
+        const stateA = new TestStateA(StateEnum.UNIT_TEST_STATE_A);
         const onLeaveSpy = jest.spyOn(stateA, 'onLeave');
         const onEntrySpy = jest.spyOn(stateA, 'onEntry');
         
         stateMachine.addState(stateA);
         stateMachine.start();
         
-        stateMachine.transition(StateEnum.TEST_STATE_A);
+        stateMachine.transition(StateEnum.UNIT_TEST_STATE_A);
         
         expect(onLeaveSpy).toHaveBeenCalledTimes(1);
         expect(onEntrySpy).toHaveBeenCalledTimes(2); // Once on start, once on re-entry
     });
 
     test('should handle transition from substate to uncle state', () => {
-        const parent1 = new TestParentState(StateEnum.PARENT);
-        const child1 = new TestStateA(StateEnum.CHILD_A);
+        const parent1 = new TestParentState(StateEnum.UNIT_TEST_PARENT);
+        const child1 = new TestStateA(StateEnum.UNIT_TEST_CHILD_A);
         parent1.addSubstate(child1);
         
-        const parent2 = new TestParentState(StateEnum.CHILD_B);
-        const child2 = new TestStateA(StateEnum.GRANDCHILD);
+        const parent2 = new TestParentState(StateEnum.UNIT_TEST_CHILD_B);
+        const child2 = new TestStateA(StateEnum.UNIT_TEST_GRANDCHILD);
         parent2.addSubstate(child2);
 
         stateMachine.addState(parent1);
@@ -61,9 +61,9 @@ describe('Critical Scenarios', () => {
         // A full implementation would need to orchestrate the exit from parent1's hierarchy
         // and entry into parent2's.
         expect(() => {
-            stateMachine.transition(StateEnum.PARENT);
-            parent1.transition(StateEnum.CHILD_A);
-            stateMachine.transition(StateEnum.CHILD_B);
+            stateMachine.transition(StateEnum.UNIT_TEST_PARENT);
+            parent1.transition(StateEnum.UNIT_TEST_CHILD_A);
+            stateMachine.transition(StateEnum.UNIT_TEST_CHILD_B);
         }).not.toThrow();
     });
   });

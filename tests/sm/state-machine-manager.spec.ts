@@ -62,7 +62,7 @@ describe('StateMachineManager', () => {
         const machine1Spy = jest.spyOn(machine1, 'onEvent').mockReturnValue(false);
         const machine2Spy = jest.spyOn(machine2, 'onEvent').mockReturnValue(false);
         
-        stateMachineManager.onEvent(EventEnum.DO_NOT_CONSUME_EVENT);
+        stateMachineManager.onEvent(EventEnum.UNIT_TEST_DO_NOT_CONSUME_EVENT);
 
         expect(machine2Spy).toHaveBeenCalled();
         expect(machine1Spy).toHaveBeenCalled();
@@ -72,9 +72,9 @@ describe('StateMachineManager', () => {
       const machine1Spy = jest.spyOn(machine1, 'onEvent').mockReturnValue(false);
       const machine2Spy = jest.spyOn(machine2, 'onEvent').mockReturnValue(true);
 
-      stateMachineManager.onEvent(EventEnum.CONSUME_EVENT);
+      stateMachineManager.onEvent(EventEnum.UNIT_TEST_CONSUME_EVENT);
 
-      expect(machine2Spy).toHaveBeenCalledWith(EventEnum.CONSUME_EVENT);
+      expect(machine2Spy).toHaveBeenCalledWith(EventEnum.UNIT_TEST_CONSUME_EVENT);
       expect(machine1Spy).not.toHaveBeenCalled();
     });
 
@@ -82,7 +82,7 @@ describe('StateMachineManager', () => {
         const machine1Spy = jest.spyOn(machine1, 'onEvent').mockReturnValue(false);
         const machine2Spy = jest.spyOn(machine2, 'onEvent').mockReturnValue(false);
 
-        stateMachineManager.onEvent(EventEnum.DO_NOT_CONSUME_EVENT);
+        stateMachineManager.onEvent(EventEnum.UNIT_TEST_DO_NOT_CONSUME_EVENT);
         
         expect(machine1Spy).toHaveBeenCalled();
         expect(machine2Spy).toHaveBeenCalled();
@@ -93,9 +93,9 @@ describe('StateMachineManager', () => {
         jest.spyOn(machine1, 'onEvent').mockReturnValue(false);
         jest.spyOn(machine2, 'onEvent').mockReturnValue(false);
 
-        stateMachineManager.onEvent(EventEnum.DO_NOT_CONSUME_EVENT);
+        stateMachineManager.onEvent(EventEnum.UNIT_TEST_DO_NOT_CONSUME_EVENT);
         
-        expect(consoleWarnSpy).toHaveBeenCalledWith('Event DO_NOT_CONSUME_EVENT was not handled by any state machine.');
+        expect(consoleWarnSpy).toHaveBeenCalledWith('Event UNIT_TEST_DO_NOT_CONSUME_EVENT was not handled by any state machine.');
         consoleWarnSpy.mockRestore();
     });
   });

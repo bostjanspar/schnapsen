@@ -8,25 +8,27 @@ import { GameInteractions } from './game-interactions';
 import { GameAnimations } from './game-animations';
 import { MaterialFactory } from '../utils/material.factory';
 import { UIUtils } from '../utils/ui.utils';
+import { GUIStateManager, GUIState } from '../gui-state-manager';
 import TWEEN from '@tweenjs/tween.js';
 
 
 
 export class GameScene extends BaseScene {
-  private cardManager!: CardManager;
+  public cardManager!: CardManager;
   private gameInteractions!: GameInteractions;
+  public guiStateManager!: GUIStateManager;
 
   // Game state
   private deck!: Card[];
   private trumpSuit!: Suit;
   
   // Card groups for easy management
-  private playerHandGroup: THREE.Group = new THREE.Group();
-  private opponentHandGroup: THREE.Group = new THREE.Group();
-  private talonGroup: THREE.Group = new THREE.Group();
-  private currentTrickGroup: THREE.Group = new THREE.Group();
-  private playerTricksGroup: THREE.Group = new THREE.Group();
-  private opponentTricksGroup: THREE.Group = new THREE.Group();
+  public playerHandGroup: THREE.Group = new THREE.Group();
+  public opponentHandGroup: THREE.Group = new THREE.Group();
+  public talonGroup: THREE.Group = new THREE.Group();
+  public currentTrickGroup: THREE.Group = new THREE.Group();
+  public playerTricksGroup: THREE.Group = new THREE.Group();
+  public opponentTricksGroup: THREE.Group = new THREE.Group();
 
  
 
@@ -38,6 +40,7 @@ export class GameScene extends BaseScene {
 
   public async initialize() {
     this.cardManager = new CardManager(this);
+    this.guiStateManager = new GUIStateManager(this);
     this.gameInteractions = new GameInteractions(this.camera, this);
 
     await MaterialFactory.preloadAllMaterials();
@@ -239,5 +242,13 @@ export class GameScene extends BaseScene {
     this.gameInteractions.handleCardHover(mouse, (card) => {
       // Handle hover effect, e.g., by scaling the card
     });
+  }
+
+  public saveCurrentState(): GUIState {
+    return this.guiStateManager.captureState();
+  }
+
+  public loadState(state: GUIState): void {
+    this.guiStateManager.restoreState(state);
   }
 }

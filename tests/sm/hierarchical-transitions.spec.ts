@@ -15,10 +15,10 @@ describe('Hierarchical States', () => {
   beforeEach(() => {
     stateMachine = new StateMachine();
     
-    parentState = MockStateFactory.createSpyState(StateEnum.PARENT);
-    childStateA = MockStateFactory.createSpyState(StateEnum.CHILD_A);
-    childStateB = MockStateFactory.createSpyState(StateEnum.CHILD_B);
-    grandChildState = MockStateFactory.createSpyState(StateEnum.GRANDCHILD);
+    parentState = MockStateFactory.createSpyState(StateEnum.UNIT_TEST_PARENT);
+    childStateA = MockStateFactory.createSpyState(StateEnum.UNIT_TEST_CHILD_A);
+    childStateB = MockStateFactory.createSpyState(StateEnum.UNIT_TEST_CHILD_B);
+    grandChildState = MockStateFactory.createSpyState(StateEnum.UNIT_TEST_GRANDCHILD);
 
     // Setup hierarchy
     parentState.parent = null;
@@ -40,7 +40,7 @@ describe('Hierarchical States', () => {
 
     // Mock transition implementations
     parentState.transition.mockImplementation((targetId) => {
-        if (targetId === StateEnum.CHILD_A) {
+        if (targetId === StateEnum.UNIT_TEST_CHILD_A) {
             // @ts-ignore
             parentState.activeSubstate = childStateA;
             return true;
@@ -49,7 +49,7 @@ describe('Hierarchical States', () => {
     });
 
     childStateA.transition.mockImplementation((targetId) => {
-        if (targetId === StateEnum.GRANDCHILD) {
+        if (targetId === StateEnum.UNIT_TEST_GRANDCHILD) {
             // @ts-ignore
             childStateA.activeSubstate = grandChildState;
             return true;
@@ -61,7 +61,7 @@ describe('Hierarchical States', () => {
 
   describe('Event Bubbling', () => {
     beforeEach(() => {
-        stateMachine.transition(StateEnum.PARENT);
+        stateMachine.transition(StateEnum.UNIT_TEST_PARENT);
         // @ts-ignore
         stateMachine.currentState.activeSubstate = childStateA;
         // @ts-ignore
@@ -69,8 +69,8 @@ describe('Hierarchical States', () => {
     });
 
     test('should start event processing at deepest active child', () => {
-      stateMachine.onEvent(EventEnum.DO_NOT_CONSUME_EVENT);
-      expect(grandChildState.onEvent).toHaveBeenCalledWith(EventEnum.DO_NOT_CONSUME_EVENT);
+      stateMachine.onEvent(EventEnum.UNIT_TEST_DO_NOT_CONSUME_EVENT);
+      expect(grandChildState.onEvent).toHaveBeenCalledWith(EventEnum.UNIT_TEST_DO_NOT_CONSUME_EVENT);
     });
 
     test('should bubble up to parent if child returns false', () => {
@@ -78,7 +78,7 @@ describe('Hierarchical States', () => {
       childStateA.onEvent.mockReturnValue(false);
       parentState.onEvent.mockReturnValue(false);
 
-      stateMachine.onEvent(EventEnum.DO_NOT_CONSUME_EVENT);
+      stateMachine.onEvent(EventEnum.UNIT_TEST_DO_NOT_CONSUME_EVENT);
 
       expect(grandChildState.onEvent).toHaveBeenCalled();
       expect(childStateA.onEvent).toHaveBeenCalled();
@@ -90,7 +90,7 @@ describe('Hierarchical States', () => {
         childStateA.onEvent.mockReturnValue(true);
         parentState.onEvent.mockReturnValue(false);
 
-        stateMachine.onEvent(EventEnum.DO_NOT_CONSUME_EVENT);
+        stateMachine.onEvent(EventEnum.UNIT_TEST_DO_NOT_CONSUME_EVENT);
 
         expect(grandChildState.onEvent).toHaveBeenCalled();
         expect(childStateA.onEvent).toHaveBeenCalled();
