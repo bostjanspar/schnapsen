@@ -87,4 +87,14 @@ export class ThreeService {
 
     this.activeScene.onMouseEvent(mouse);
   }
+
+  public handleMouseMove(event: MouseEvent) {
+    if (!this.activeScene.allowMouseEvent) return;
+
+    const mouse = new THREE.Vector2();
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+    this.activeScene.onMouseMove(mouse);
+  }
 }

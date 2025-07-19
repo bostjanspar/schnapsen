@@ -1,59 +1,21 @@
 import * as THREE from 'three';
 import { BaseScene } from './base.scene';
+import { Card, Suit, Rank, CARD_VALUES } from '../schnapsen.rules';
+import { GameConstants } from '../game.constants';
+import { CardManager } from './card-manager';
+import { CardLayout } from './card-layout';
+import { GameInteractions } from './game-interactions';
+import { GameAnimations } from './game-animations';
+import { MaterialFactory } from '../utils/material.factory';
+import { UIUtils } from '../utils/ui.utils';
+import TWEEN from '@tweenjs/tween.js';
 
-// Card dimensions and layout constants
-const CARD_WIDTH = 1.6;
-const CARD_HEIGHT = 2.2;
-const CARD_THICKNESS = 0.02;
 
-// Card suits and ranks for Schnapsen (20-card deck)
-export enum Suit {
-  HEARTS = 'hearts',
-  DIAMONDS = 'diamonds',
-  CLUBS = 'clubs',
-  SPADES = 'spades'
-}
-
-export enum Rank {
-  ACE = 'ace',
-  TEN = 'ten',
-  KING = 'king',
-  QUEEN = 'queen',
-  JACK = 'jack'
-}
-
-export interface Card {
-  suit: Suit;
-  rank: Rank;
-  value: number;
-  id: string;
-}
-
-// Card values according to Schnapsen rules
-const CARD_VALUES: Record<Rank, number> = {
-  [Rank.ACE]: 11,
-  [Rank.TEN]: 10,
-  [Rank.KING]: 4,
-  [Rank.QUEEN]: 3,
-  [Rank.JACK]: 2
-};
-
-export interface CardPosition {
-  x: number;
-  y: number;
-  z: number;
-  rotation: number;
-  faceUp: boolean;
-}
-
-const player_Y: number = -2.5;
 
 export class GameScene extends BaseScene {
-  private raycaster = new THREE.Raycaster();
-  private cardGeometry!: THREE.BoxGeometry;
-  private cardMaterials!: Map<string, THREE.MeshLambertMaterial>;
-  private cardMeshes!: Map<string, THREE.Mesh>;
-  
+  private cardManager!: CardManager;
+  private gameInteractions!: GameInteractions;
+
   // Game state
   private deck!: Card[];
   private trumpSuit!: Suit;
@@ -75,67 +37,30 @@ export class GameScene extends BaseScene {
   }
 
   public async initialize() {
-    this.cardMeshes = new Map();
-    this.setupGeometry();
-    await this.setupMaterials();
-    this.initializeDeck();
+    this.cardManager = new CardManager(this);
+    this.gameInteractions = new GameInteractions(this.camera, this);
+
+    await MaterialFactory.preloadAllMaterials();
+
+    this.deck = this.initializeDeck();
     this.createCardGroups();
     this.setupTable();
-    this.layoutCards();
+    this.layoutCards(this.deck);
+
+    const closeTalonButton = UIUtils.createButton('Close Talon', { width: 1, height: 0.5 }, {});
+    closeTalonButton.position.set(3, -2.5, 0);
+    this.add(closeTalonButton);
+
+    const scoreLabel = UIUtils.createLabel('Score: 0', { x: -4, y: 2.5, z: 0 }, {});
+    this.add(scoreLabel);
   }
 
-  private setupGeometry(): void {
-    this.cardGeometry = new THREE.BoxGeometry(CARD_WIDTH, CARD_HEIGHT, CARD_THICKNESS);
-  }
 
-  private async setupMaterials(): Promise<void> {
-    this.cardMaterials = new Map();
-    const textureLoader = new THREE.TextureLoader();
-
-    // Create card back material
-    const canvas = document.createElement('canvas');
-    canvas.width = 256;
-    canvas.height = 356;
-    const ctx = canvas.getContext('2d')!;
-    ctx.fillStyle = '#1a237e';
-    ctx.fillRect(0, 0, 256, 356);
-    ctx.fillStyle = '#ffffff';
-    ctx.font = '20px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('SCHNAPSEN', 128, 180);
-    const cardBackTexture = new THREE.CanvasTexture(canvas);
-    const cardBackMaterial = new THREE.MeshLambertMaterial({ map: cardBackTexture });
-    this.cardMaterials.set('back', cardBackMaterial);
-
-    // Load card face textures
-    const cardFaces = [];
-    for (const suit of Object.values(Suit)) {
-      for (const rank of Object.values(Rank)) {
-        const cardId = `${suit}_${rank}`;
-        const path = `/assets/cards/${suit}_${rank}.svg`;
-        cardFaces.push(new Promise((resolve) => {
-          textureLoader.load(path, (texture) => {
-            this.cardMaterials.set(cardId, new THREE.MeshLambertMaterial({ map: texture }));
-            resolve(null);
-          });
-        }));
-      }
-    }
-
-    await Promise.all(cardFaces);
-
-    console.log('Card materials:', this.cardMaterials);
-
-    // Table material
-    const tableMaterial = new THREE.MeshLambertMaterial({ color: 0x2d5a3d });
-    this.cardMaterials.set('table', tableMaterial);
-  }
-
-  private initializeDeck(): void {
-    this.deck = [];
+  private initializeDeck(): Card[] {
+    const deck: Card[] = [];
     Object.values(Suit).forEach(suit => {
       Object.values(Rank).forEach(rank => {
-        this.deck.push({
+        deck.push({
           suit,
           rank,
           value: CARD_VALUES[rank],
@@ -144,14 +69,7 @@ export class GameScene extends BaseScene {
       });
     });
     
-    // Shuffle deck
-    for (let i = this.deck.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [this.deck[i], this.deck[j]] = [this.deck[j], this.deck[i]];
-    }
-    
-    // Set trump suit (first card after dealing)
-    this.trumpSuit = this.deck[10].suit; // 10th card is trump indicator
+    return this.cardManager.shuffleDeck(deck);
   }
 
   private createCardGroups(): void {
@@ -184,7 +102,7 @@ export class GameScene extends BaseScene {
   private setupTable(): void {
     // Table surface
     const tableGeometry = new THREE.CircleGeometry(12, 64);
-    const tableMaterial = this.cardMaterials.get('table')!;
+    const tableMaterial = MaterialFactory.getUIMaterial('table', { color: 0x2d5a3d });
     const table = new THREE.Mesh(tableGeometry, tableMaterial);
     //table.rotation.x = -Math.PI / 2;
     table.position.y = -0.1;
@@ -193,114 +111,47 @@ export class GameScene extends BaseScene {
     this.add(table);
   }
 
-  private layoutCards(): void {
-    // Deal initial cards according to Schnapsen rules
-    this.dealInitialCards();
-    this.setupTalon();
-    this.setupCollectedTricks();
-  }
+  private layoutCards(deck: Card[]): void {
+    const { player1Hand, player2Hand, talon } = this.cardManager.dealCards(deck);
 
-  private dealInitialCards(): void {
-    // Player hand (bottom) - 5 cards face up
-    for (let i = 0; i < 5; i++) {
-      const card = this.deck[i];
-      const cardMesh = this.createCardMesh(card, true);
-      cardMesh.position.set((i - 2) * (CARD_WIDTH + 0.1), player_Y, 0);
-      cardMesh.name = `playerCard_${i}`;
+    const player1HandPositions = CardLayout.calculateHandPositions(player1Hand.length, {});
+    player1Hand.forEach((card: Card, i: number) => {
+      const cardMesh = this.cardManager.createCard(card, true);
+      cardMesh.position.set(player1HandPositions[i].x, player1HandPositions[i].y, player1HandPositions[i].z);
       this.playerHandGroup.add(cardMesh);
-      this.cardMeshes.set(`playerCard_${i}`, cardMesh);
-    }
+    });
 
-    // Opponent hand (top) - 5 cards face down
-    for (let i = 0; i < 5; i++) {
-      const card = this.deck[i + 5];
-      const cardMesh = this.createCardMesh(card, false);
-      cardMesh.position.set((i - 2) * (CARD_WIDTH + 0.1), 4, -2);
-      cardMesh.rotation.y = Math.PI;
-      cardMesh.name = `opponentCard_${i}`;
+    const player2HandPositions = CardLayout.calculateHandPositions(player2Hand.length, {});
+    player2Hand.forEach((card: Card, i: number) => {
+      const cardMesh = this.cardManager.createCard(card, false);
+      cardMesh.position.set(player2HandPositions[i].x, player2HandPositions[i].y + 5, player2HandPositions[i].z);
       this.opponentHandGroup.add(cardMesh);
-      this.cardMeshes.set(`opponentCard_${i}`, cardMesh);
-    }
-  }
+    });
 
-  private setupTalon(): void {
-    // Trump card (face up) - 11th card
-    const trumpCard = this.deck[10];
-    const trumpCardMesh = this.createCardMesh(trumpCard, true);
-    trumpCardMesh.rotation.z = -Math.PI / 2;
-    trumpCardMesh.position.set(-2, 0, 0);
-    trumpCardMesh.name = 'trumpCard';
-    this.talonGroup.add(trumpCardMesh);
-    this.cardMeshes.set('trumpCard', trumpCardMesh);
-
-    // Remaining talon cards (face down stack) - 10 cards
-    for (let i = 0; i < 9; i++) {
-      const card = this.deck[i + 11];
-      const cardMesh = this.createCardMesh(card, false);
-      cardMesh.position.set(-3, i * 0.01, 0.2);
-      cardMesh.name = `talonCard_${i}`;
+    const talonLayout = CardLayout.getTalonLayout();
+    talon.forEach((card: Card, i: number) => {
+      const cardMesh = this.cardManager.createCard(card, i === 0);
+      cardMesh.position.set(talonLayout.position.x, talonLayout.position.y, talonLayout.position.z + i * 0.02);
       this.talonGroup.add(cardMesh);
-      this.cardMeshes.set(`talonCard_${i}`, cardMesh);
-    }
+    });
+
+    this.trumpSuit = talon[0].suit;
   }
 
-  private setupCollectedTricks(): void {
-    // Current trick area (center)
-    // These will be populated during gameplay
-    
-    // Player collected tricks pile (bottom right)
-    const playerTricksPile = new THREE.Mesh(
-      this.cardGeometry,
-      this.cardMaterials.get('back')!
-    );
-    playerTricksPile.position.set(5, 0, -3);
-    playerTricksPile.name = 'playerTricksPile';
-    playerTricksPile.visible = false; // Initially hidden
-    this.playerTricksGroup.add(playerTricksPile);
-    this.cardMeshes.set('playerTricksPile', playerTricksPile);
 
-    // Opponent collected tricks pile (top right)
-    const opponentTricksPile = new THREE.Mesh(
-      this.cardGeometry,
-      this.cardMaterials.get('back')!
-    );
-    opponentTricksPile.position.set(5, 0, 3);
-    opponentTricksPile.name = 'opponentTricksPile';
-    opponentTricksPile.visible = false; // Initially hidden
-    this.opponentTricksGroup.add(opponentTricksPile);
-    this.cardMeshes.set('opponentTricksPile', opponentTricksPile);
-  }
 
-  private createCardMesh(card: Card, faceUp: boolean): THREE.Mesh {
-    console.log('Applying material:', this.cardMaterials.get(card.id));
-    const materials = [
-      this.cardMaterials.get('back')!, // Right
-      this.cardMaterials.get('back')!, // Left  
-      this.cardMaterials.get('back')!, // Top
-      this.cardMaterials.get('back')!, // Bottom
-      faceUp ? this.cardMaterials.get(card.id)! : this.cardMaterials.get('back')!, // Front
-      this.cardMaterials.get('back')!  // Back
-    ];
-
-    const cardMesh = new THREE.Mesh(this.cardGeometry, materials);
-    cardMesh.userData = { card, faceUp };
-    cardMesh.castShadow = true;
-    cardMesh.receiveShadow = true;
-    
-    return cardMesh;
-  }
 
   public playCardToTrick(cardName: string, isPlayer: boolean): void {
-    const cardMesh = this.cardMeshes.get(cardName);
+    const cardMesh = this.cardManager.cardMeshes.get(cardName);
     if (!cardMesh) return;
 
     // Move card to current trick area
-    const trickPosition = isPlayer ? 
-      new THREE.Vector3(0, 0, -1) : 
+    const fromPos = cardMesh.position.clone();
+    const trickPosition = isPlayer ?
+      new THREE.Vector3(0, 0, -1) :
       new THREE.Vector3(0, 0, 1);
-    
-    cardMesh.position.copy(trickPosition);
-    
+    GameAnimations.animateCardPlay(cardMesh, fromPos, trickPosition);
+
     // Remove from hand group and add to trick group
     if (isPlayer) {
       this.playerHandGroup.remove(cardMesh);
@@ -313,8 +164,8 @@ export class GameScene extends BaseScene {
   public collectTrick(winner: 'player' | 'opponent'): void {
     const tricksGroup = winner === 'player' ? this.playerTricksGroup : this.opponentTricksGroup;
     const tricksPile = winner === 'player' ? 
-      this.cardMeshes.get('playerTricksPile')! : 
-      this.cardMeshes.get('opponentTricksPile')!;
+      this.cardManager.cardMeshes.get('playerTricksPile')! : 
+      this.cardManager.cardMeshes.get('opponentTricksPile')!;
 
     // Move all cards from current trick to winner's pile
     this.currentTrickGroup.children.forEach(cardMesh => {
@@ -346,58 +197,47 @@ export class GameScene extends BaseScene {
       this.playerHandGroup.add(topCard);
       // Reposition in hand
       const handSize = this.playerHandGroup.children.length;
-      topCard.position.set((handSize - 3) * (CARD_WIDTH + 0.1), 0, -5);
+      topCard.position.set((handSize - 3) * (GameConstants.CARD_DIMENSIONS.width + GameConstants.CARD_SPACING), 0, -5);
     } else {
       this.opponentHandGroup.add(topCard);
       const handSize = this.opponentHandGroup.children.length;
-      topCard.position.set((handSize - 3) * (CARD_WIDTH + 0.1), 0, 5);
+      topCard.position.set((handSize - 3) * (GameConstants.CARD_DIMENSIONS.width + GameConstants.CARD_SPACING), 0, 5);
     }
   }
 
   public closeTalon(): void {
     // Flip trump card face down
-    const trumpCard = this.cardMeshes.get('trumpCard');
+    const trumpCard = this.cardManager.cardMeshes.get('trumpCard');
     if (trumpCard) {
       trumpCard.rotation.y = Math.PI;
     }
   }
 
   public onMouseEvent(mouse: THREE.Vector2): void {
-    this.raycaster.setFromCamera(mouse, this.camera);
-    const intersects = this.raycaster.intersectObjects(this.children, true);
-
-    if (intersects.length > 0) {
-      const clickedObject = intersects[0].object as THREE.Mesh;
-      
-      // Handle card clicks
-      if (clickedObject.name.startsWith('playerCard_')) {
-        this.onCardClick(clickedObject);
-      }
-    }
+    this.gameInteractions.handleCardClick(mouse, (card) => {
+      this.onCardClick(card);
+    });
   }
 
-  private onCardClick(cardMesh: THREE.Mesh): void {
+  private onCardClick(card: THREE.Object3D): void {
     // Example: highlight selected card
-    if (cardMesh.userData['selected']) {
-      cardMesh.position.y = player_Y;
-      cardMesh.userData['selected'] = false;
+    if (card.userData['selected']) {
+      card.position.y = GameConstants.HAND_POSITIONS.player1.y;
+      card.userData['selected'] = false;
     } else {
-      cardMesh.position.y = player_Y+0.3;
-      cardMesh.userData['selected'] = true;
+      card.position.y = GameConstants.HAND_POSITIONS.player1.y + 0.3;
+      card.userData['selected'] = true;
     }
   }
 
   public update(): void {
-    // Add any animations or updates here
-    // For example, gentle floating animation for selected cards
-    this.children.forEach(group => {
-      if (group instanceof THREE.Group) {
-        group.children.forEach(child => {
-          if (child.userData['selected']) {
-            child.position.y = (player_Y+0.3) + Math.sin(Date.now() * 0.003) * 0.1;
-          }
-        });
-      }
+    TWEEN.update();
+    GameAnimations.animateHandReorganization(this.playerHandGroup);
+  }
+
+  public onMouseMove(mouse: THREE.Vector2): void {
+    this.gameInteractions.handleCardHover(mouse, (card) => {
+      // Handle hover effect, e.g., by scaling the card
     });
   }
 }

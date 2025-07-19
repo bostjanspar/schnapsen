@@ -36,4 +36,9 @@ export class ThreeSceneComponent implements OnInit {
   onClick(event: MouseEvent) {
     this.threeService.handleInteraction(event);
   }
+
+  @HostListener('window:mousemove', ['$event'])
+  onMouseMove(event: MouseEvent) {
+    this.threeService.handleMouseMove(event);
+  }
 }

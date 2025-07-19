@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { BaseScene } from './base.scene';
+import { UIUtils } from '../utils/ui.utils';
 
 export class StartupScene extends BaseScene {
   private raycaster = new THREE.Raycaster();
@@ -9,9 +10,7 @@ export class StartupScene extends BaseScene {
     this.background = new THREE.Color(0xcccccc);
     this.allowMouseEvent = true;
 
-    const geometry = new THREE.BoxGeometry(2, 0.5, 0.1);
-    const material = new THREE.MeshBasicMaterial({ color: 0x007bff });
-    const button = new THREE.Mesh(geometry, material);
+    const button = UIUtils.createButton('Start Game', { width: 2, height: 0.5 }, { backgroundColor: '#007bff' });
     button.name = 'startButton';
     this.add(button);
   }
@@ -27,5 +26,9 @@ export class StartupScene extends BaseScene {
 
   public update(): void {
     // No animation in the startup scene
+  }
+
+  public onMouseMove(mouse: THREE.Vector2): void {
+    // No mouse move interaction in the startup scene
   }
 }
