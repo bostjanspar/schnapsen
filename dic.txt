@@ -1,1 +1,5 @@
-If I provide you. SVG files. Which are the card name textures. Would you be able to create me textures atlas map that I can use it as a texture in my three JS project? 
+make you self detail plan go step by step , before continue to next step make 
+ sure ng build  has no build errors
+
+
+ 

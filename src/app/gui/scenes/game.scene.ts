@@ -102,9 +102,9 @@ export class GameScene extends BaseScene {
   private setupTable(): void {
     // Table surface
     const tableGeometry = new THREE.CircleGeometry(12, 64);
-    const tableMaterial = MaterialFactory.getUIMaterial('table', { color: 0x2d5a3d });
+    // Use MeshBasicMaterial directly to ensure color is correct
+    const tableMaterial = new THREE.MeshBasicMaterial({ color: 0x1a4a3a }); // Dark green
     const table = new THREE.Mesh(tableGeometry, tableMaterial);
-    //table.rotation.x = -Math.PI / 2;
     table.position.y = -0.1;
     table.position.z = -5;
     table.name = 'table';
