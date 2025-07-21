@@ -6,7 +6,8 @@ export class MaterialFactory {
   private static materialCache: Map<string, THREE.Material> = new Map();
 
   static getCardMaterial(cardId: string, faceUp: boolean): THREE.Material {
-    const cacheKey = `${cardId}-${faceUp}`;
+
+    const cacheKey = faceUp ? `${cardId}` : `back`;
     if (this.materialCache.has(cacheKey)) {
       return this.materialCache.get(cacheKey)!;
     }
@@ -35,7 +36,7 @@ export class MaterialFactory {
     const cardBackMaterial = new THREE.MeshLambertMaterial({
       map: TextureUtils.createCardBackTexture('default', []),
     });
-    this.materialCache.set('back-false', cardBackMaterial);
+    this.materialCache.set('back', cardBackMaterial);
 
     // Preload card faces
     for (const suit of Object.values(Suit)) {
@@ -45,7 +46,7 @@ export class MaterialFactory {
         const promise = new Promise<void>((resolve) => {
           textureLoader.load(path, (texture) => {
             const material = new THREE.MeshLambertMaterial({ map: texture });
-            this.materialCache.set(`${cardId}-true`, material);
+            this.materialCache.set(`${cardId}`, material);
             resolve();
           });
         });

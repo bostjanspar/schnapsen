@@ -45,6 +45,19 @@ export class TextureUtils {
 
   static createCardBackTexture(design: string, colors: string[]): THREE.CanvasTexture {
     // Implementation will go here
-    return new THREE.CanvasTexture(document.createElement('canvas'));
+
+    // Create card back material
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 356;
+    const ctx = canvas.getContext('2d')!;
+    ctx.fillStyle = '#1a237e';
+    ctx.fillRect(0, 0, 256, 356);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '20px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('SCHNAPSEN', 128, 180);
+    return  new THREE.CanvasTexture(canvas);
+
   }
 }
