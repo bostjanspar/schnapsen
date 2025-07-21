@@ -1,5 +1,5 @@
 export const GameConstants = {
-  CARD_DIMENSIONS: { width: 0.4, height: 0.6, depth: 0.01 },
+  CARD_DIMENSIONS: { width: 1.6, height: 2.4, depth: 0.01 },
   CARD_SPACING: 0.1,
   ANIMATION_DURATION: 500,
   EASING: 'easeInOutQuad',
