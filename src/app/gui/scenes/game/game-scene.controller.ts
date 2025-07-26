@@ -1,3 +1,5 @@
+import { ThreeService } from '../../services/three.service';
+import { SchnapsenScene } from '../schnapsen-scene.enum';
 import { GameScene } from './game.scene';
 import { Card } from '../../../logic/schnapsen.rules';
 import * as THREE from 'three';
@@ -5,7 +7,11 @@ import { CardLayout } from './cards/card-layout';
 import { GameConstants } from '../../../logic/game.constants';
 
 export class GameSceneController {
-  constructor(private gameScene: GameScene) {}
+  constructor(private gameScene: GameScene, private threeService: ThreeService) {}
+
+  public showSelectDealerScene(dealerCard: Card): void {
+    this.threeService.setActiveScene(SchnapsenScene.SelectDealer, dealerCard);
+  }
 
   public displayHands(playerCards: Card[], opponentCards: Card[]): void {
     const playerHandPositions = CardLayout.calculateHandPositions(playerCards.length);

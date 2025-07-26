@@ -7,10 +7,12 @@
 
 At launching the game I get following error in the console. Take a look into the code and try to fix it. 
 
+Let's create new scene: 
+Select the dealer. 
+In the middle of the screen where is a talun  display provided card from game logic
 
-Create new folder logic next to sm folder. That will contain all game logic needed for this game.
- Look into the rules and see all the logic that is required for this game. 
-Then create root state machine for a  seven game points
- 
+if it's a red then the player 1 dealer if a black suit then the player 2 is the dealer.
+ Make some arrow animation if the player one make some arrow down animation  if it's a.
+Player two dealer make an arrow up animation.
 
- first for the whole game. And then for each game that is being played and then still sub state for each three game where we will always check which card can be played and what should be done and you will communicate or state changes to game state machine. 
+

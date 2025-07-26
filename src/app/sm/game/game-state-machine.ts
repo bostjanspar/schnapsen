@@ -19,7 +19,7 @@ export class GameStateMachine extends StateMachine {
   ) {
     super();
 
-    this.addState(new SelectDealerState(this, this.gameStateService));
+    this.addState(new SelectDealerState(this, this.gameStateService, this.gameSceneController));
     this.addState(new DealCardsState(this, this.gameStateService, this.gameSceneController));
     this.addState(new CurrentGameState(this, this.gameStateService, this.gameSceneController));
     this.addState(new EndOfHandAnimationState(this, this.gameSceneController));

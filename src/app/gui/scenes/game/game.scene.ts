@@ -9,7 +9,9 @@ import { GameAnimations } from './interactions/game-animations';
 import { MaterialFactory } from '../../utils/material.factory';
 import { UIUtils } from '../../utils/ui.utils';
 import { GUIStateManager, GUIState } from './state/gui-state-manager';
+import { ThreeService } from '../../services/three.service';
 import { GameStateService } from '../../../logic/game-state.service';
+import { RandomService } from '../../../logic/random.service';
 import { GameSceneController } from './game-scene.controller';
 import { StateMachineManager } from '../../../sm/state-machine-manager';
 import { GameStateMachine } from '../../../sm/game/game-state-machine';
@@ -45,15 +47,16 @@ export class GameScene extends BaseScene {
     this.allowMouseEvent = true;
   }
 
-  public async initialize() {
+  public override async initialize(threeService: ThreeService) {
     this.cardManager = new CardManager(this);
     this.guiStateManager = new GUIStateManager(this);
     this.gameInteractions = new GameInteractions(this);
 
     await MaterialFactory.preloadAllMaterials();
 
-    this.gameStateService = new GameStateService();
-    this.gameSceneController = new GameSceneController(this);
+    const randomService = new RandomService();
+    this.gameStateService = new GameStateService(randomService);
+    this.gameSceneController = new GameSceneController(this, threeService);
     this.stateMachineManager = new StateMachineManager();
     const gameSM = new GameStateMachine(this.gameStateService, this.stateMachineManager, this.gameSceneController);
     this.stateMachineManager.registerStateMachine(gameSM);

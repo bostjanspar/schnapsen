@@ -7,4 +7,5 @@ export abstract class BaseScene extends THREE.Scene {
   public abstract onMouseEvent(mouse: THREE.Vector2): void;
   public abstract onMouseMove(mouse: THREE.Vector2): void;
   public abstract update(): void;
+  public initialize?(...args: any[]): void;
 }

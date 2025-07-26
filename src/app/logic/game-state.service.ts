@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Card, Suit, Rank, CARD_VALUES } from './schnapsen.rules';
+import { RandomService } from './random.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,13 @@ export class GameStateService {
   public trumpCard$ = new BehaviorSubject<Card | null>(null);
   public isTalonClosed$ = new BehaviorSubject<boolean>(false);
 
-  constructor() { }
+  constructor(private randomService: RandomService) { }
+
+  public selectDealer(): Card {
+    const deck = this.initializeDeck();
+    const shuffledDeck = this.shuffleDeck(deck);
+    return shuffledDeck[0];
+  }
 
   public prepareNewHand(): void {
     const deck = this.initializeDeck();
@@ -40,7 +47,7 @@ export class GameStateService {
 
   private shuffleDeck(deck: Card[]): Card[] {
     for (let i = deck.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
+      const j = this.randomService.getRandomNumber(i + 1);
       [deck[i], deck[j]] = [deck[j], deck[i]];
     }
     return deck;

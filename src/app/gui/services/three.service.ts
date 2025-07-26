@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import * as THREE from 'three';
 import { SchnapsenScene } from '../scenes/schnapsen-scene.enum';
 import { StartupScene } from '../scenes/startup/startup.scene';
+import { SelectDealerScene } from '../scenes/select-dealer/select-dealer.scene';
 import { GameScene } from '../scenes/game/game.scene';
 import { BaseScene } from '../scenes/base.scene';
 
@@ -32,9 +33,10 @@ export class ThreeService {
 
     // Scenes
     const gameScene = new GameScene();
-    await gameScene.initialize();
+    await gameScene.initialize(this);
 
     this.scenes.set(SchnapsenScene.Startup, new StartupScene(() => this.setActiveScene(SchnapsenScene.Game)));
+    this.scenes.set(SchnapsenScene.SelectDealer, new SelectDealerScene());
     this.scenes.set(SchnapsenScene.Game, gameScene);
     this.scenes.forEach(scene => scene.camera = this.camera);
 
@@ -47,8 +49,11 @@ export class ThreeService {
     window.addEventListener('resize', this.onResize);
   }
 
-  public setActiveScene(scene: SchnapsenScene) {
+  public setActiveScene(scene: SchnapsenScene, ...args: any[]) {
     this.activeScene = this.scenes.get(scene)!;
+    if (this.activeScene.initialize) {
+      this.activeScene.initialize(...args);
+    }
   }
 
   private setupLighting() {

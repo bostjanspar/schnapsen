@@ -96,8 +96,7 @@ describe('StateMachineManager', () => {
         
         stateMachineManager.onEvent(EventEnum.UNIT_TEST_DO_NOT_CONSUME_EVENT);
         
-        const enumNum = Number(EventEnum.UNIT_TEST_DO_NOT_CONSUME_EVENT);
-        expect(consoleWarnSpy).toHaveBeenCalledWith(`Event ${enumNum} was not handled by any state machine.`);
+        expect(consoleWarnSpy).toHaveBeenCalledWith('Event UNIT_TEST_DO_NOT_CONSUME_EVENT was not handled by any state machine.');
         consoleWarnSpy.mockRestore();
     });
   });
