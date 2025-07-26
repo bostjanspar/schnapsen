@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import * as THREE from 'three';
 import { SchnapsenScene } from '../scenes/schnapsen-scene.enum';
-import { StartupScene } from '../scenes/startup.scene';
-import { GameScene } from '../scenes/game.scene';
+import { StartupScene } from '../scenes/startup/startup.scene';
+import { GameScene } from '../scenes/game/game.scene';
 import { BaseScene } from '../scenes/base.scene';
 
 @Injectable({

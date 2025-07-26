@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Card } from '../schnapsen.rules';
+import { Card } from '../logic/schnapsen.rules';
 
 export class GameInteractions {
   private raycaster = new THREE.Raycaster();

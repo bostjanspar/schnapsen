@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { Card, Suit, Rank } from './schnapsen.rules';
-import { GameScene } from './scenes/game.scene';
-import { CardLayout } from './scenes/card-layout';
+import { Card, Suit, Rank } from '../logic/schnapsen.rules';
+import { GameScene } from '../game.scene';
+import { CardLayout } from '../cards/card-layout';
 
 export interface GUIState {
   playerCards: Card[];

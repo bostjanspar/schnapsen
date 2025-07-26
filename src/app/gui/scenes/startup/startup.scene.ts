@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { BaseScene } from './base.scene';
-import { UIUtils } from '../utils/ui.utils';
+import { BaseScene } from '../base.scene';
+import { UIUtils } from '../../utils/ui.utils';
 
 export class StartupScene extends BaseScene {
   private raycaster = new THREE.Raycaster();

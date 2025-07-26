@@ -1,14 +1,14 @@
 import * as THREE from 'three';
-import { BaseScene } from './base.scene';
-import { Card, Suit, Rank, CARD_VALUES } from '../schnapsen.rules';
-import { GameConstants } from '../game.constants';
-import { CardManager } from './card-manager';
-import { CardLayout } from './card-layout';
-import { GameInteractions } from './game-interactions';
-import { GameAnimations } from './game-animations';
-import { MaterialFactory } from '../utils/material.factory';
-import { UIUtils } from '../utils/ui.utils';
-import { GUIStateManager, GUIState } from '../gui-state-manager';
+import { BaseScene } from '../base.scene';
+import { Card, Suit, Rank, CARD_VALUES } from './logic/schnapsen.rules';
+import { GameConstants } from './logic/game.constants';
+import { CardManager } from './cards/card-manager';
+import { CardLayout } from './cards/card-layout';
+import { GameInteractions } from './interactions/game-interactions';
+import { GameAnimations } from './interactions/game-animations';
+import { MaterialFactory } from '../../utils/material.factory';
+import { UIUtils } from '../../utils/ui.utils';
+import { GUIStateManager, GUIState } from './state/gui-state-manager';
 import TWEEN from '@tweenjs/tween.js';
 
 

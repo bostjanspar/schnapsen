@@ -1,4 +1,4 @@
-import { GameConstants } from '../game.constants';
+import { GameConstants } from '../logic/game.constants';
 
 export class CardLayout {
   static calculateHandPositions(cardCount: number, area: any): any[] {

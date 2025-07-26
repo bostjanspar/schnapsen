@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { Card, Suit, Rank, CARD_VALUES } from '../schnapsen.rules';
-import { MaterialFactory } from '../utils/material.factory';
-import { GameConstants } from '../game.constants';
+import { Card, Suit, Rank, CARD_VALUES } from '../logic/schnapsen.rules';
+import { MaterialFactory } from '../../../utils/material.factory';
+import { GameConstants } from '../logic/game.constants';
 
 export class CardManager {
   private cardGeometry: THREE.BoxGeometry;

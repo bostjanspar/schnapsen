@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Suit, Rank } from '../schnapsen.rules';
+import { Suit, Rank } from '../scenes/game/logic/schnapsen.rules';
 import { TextureUtils } from './texture.utils';
 
 export class MaterialFactory {

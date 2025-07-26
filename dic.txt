@@ -1,5 +1,13 @@
-make you self detail plan go step by step , before continue to next step make 
- sure ng build  has no build errors
+@Screenshot.png This is the current view of the game. What the first problem is that a Trump under the Talon is missing. Can you locate this card and show it on a under talon where half of the card is visible  and rotated 90 degrees  to talon
+
+@rules.md This is a rules used for these games.
+ Please do not implement any logic in GUI, this is just for you to understand how
+ the game works and layout should look like. 
 
 
- 
+@Screenshot.png This is the current view of the game.
+
+Make an opponent cards  a little bit smaller. To gain more space for my cards
+ so that I can start using animations on mouse hover over the card 
+ starting animation from current position up and again down. This animation is considered a player can play this card. aka YES 
+ Next animation would be slowly left to right just for a few pixels and this animation should tell that player cannot play this card. aka NO

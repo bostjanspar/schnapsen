@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import TWEEN from '@tweenjs/tween.js';
-import { GameConstants } from '../game.constants';
+import { GameConstants } from '../logic/game.constants';
 
 export class GameAnimations {
   static animateCardDeal(cards: THREE.Mesh[], positions: any[], timing: number): void {
