@@ -52,10 +52,10 @@ export class GameScene extends BaseScene {
     this.layoutCards(this.deck);
 
     const closeTalonButton = UIUtils.createButton('Close Talon', { width: 1, height: 0.5 }, {});
-    closeTalonButton.position.set(3, -2.5, 0);
+    closeTalonButton.position.set(-4, 0, 0);
     this.add(closeTalonButton);
 
-    const scoreLabel = UIUtils.createLabel('Score: 0', { x: -4, y: 2.5, z: 0 }, {});
+    const scoreLabel = UIUtils.createLabel('Score: 0', { x: -5, y: 3, z: 0 }, {});
     this.add(scoreLabel);
   }
 
