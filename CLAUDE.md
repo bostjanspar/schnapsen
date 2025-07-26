@@ -26,3 +26,7 @@ This is an Angular application.
 ## Development Workflow
 
 - When implementing features or fixes, adopt a step-by-step approach. After each step, run `npm run build` to ensure the project compiles without errors before proceeding.
+
+## Git Workflow
+
+- Never run any `git` commands. I will control all git operations manually.

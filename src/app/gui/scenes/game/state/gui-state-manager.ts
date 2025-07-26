@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Card, Suit, Rank } from '../logic/schnapsen.rules';
+import { Card, Suit, Rank } from '../../../../logic/schnapsen.rules';
 import { GameScene } from '../game.scene';
 import { CardLayout } from '../cards/card-layout';
 

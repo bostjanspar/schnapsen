@@ -1,6 +1,7 @@
 
 import { StateEnum } from './state.enum';
 import { EventEnum } from './event.enum';
+import { GameEvent } from './game/game-event.enum';
 
 export abstract class BaseState {
   public parent: BaseState | null = null;
@@ -28,7 +29,7 @@ export abstract class BaseState {
 
   public abstract onEntry(): void;
   public abstract onLeave(): void;
-  public abstract onEvent(event: EventEnum, ...args: any[]): boolean;
+  public abstract onEvent(event: EventEnum | GameEvent, ...args: any[]): boolean;
 
   // Basic transition logic within the scope of the state's children
   public transition(targetStateId: StateEnum): boolean {

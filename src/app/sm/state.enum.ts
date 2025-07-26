@@ -1,4 +1,11 @@
 export enum StateEnum {
+  // Game States
+  SELECT_DEALER,
+  DEAL_CARDS,
+  CURRENT_GAME,
+  END_OF_HAND_ANIMATION,
+  CHECK_GAME_POINTS,
+  FINAL_GAME,
 
   // for testing purposes
   UNIT_TEST_STATE_A,

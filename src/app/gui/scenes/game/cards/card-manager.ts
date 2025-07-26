@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { Card, Suit, Rank, CARD_VALUES } from '../logic/schnapsen.rules';
+import { Card, Suit, Rank, CARD_VALUES } from '../../../../logic/schnapsen.rules';
+import { GameConstants } from '../../../../logic/game.constants';
 import { MaterialFactory } from '../../../utils/material.factory';
-import { GameConstants } from '../logic/game.constants';
 
 export class CardManager {
   private cardGeometry: THREE.BoxGeometry;
@@ -36,27 +36,4 @@ export class CardManager {
     // Implementation will go here
   }
 
-  public dealCards(deck: Card[]): any {
-    const player1Hand: Card[] = [];
-    const player2Hand: Card[] = [];
-    const talon: Card[] = [];
-
-    for (let i = 0; i < 5; i++) {
-      player1Hand.push(deck[i]);
-      player2Hand.push(deck[i + 5]);
-    }
-    for (let i = 10; i < deck.length; i++) {
-      talon.push(deck[i]);
-    }
-
-    return { player1Hand, player2Hand, talon };
-  }
-
-  public shuffleDeck(deck: Card[]): Card[] {
-    for (let i = deck.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [deck[i], deck[j]] = [deck[j], deck[i]];
-    }
-    return deck;
-  }
 }

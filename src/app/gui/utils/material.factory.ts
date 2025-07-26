@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Suit, Rank } from '../scenes/game/logic/schnapsen.rules';
+import { Suit, Rank } from '../../logic/schnapsen.rules';
 import { TextureUtils } from './texture.utils';
 
 export class MaterialFactory {
@@ -34,7 +34,8 @@ export class MaterialFactory {
 
     // Preload card back
     const cardBackMaterial = new THREE.MeshLambertMaterial({
-      map: TextureUtils.createCardBackTexture('default', []),
+            map: TextureUtils.createCardBackTexture('default', []),
+      transparent: true,
     });
     this.materialCache.set('back', cardBackMaterial);
 
@@ -45,7 +46,7 @@ export class MaterialFactory {
         const path = `/assets/cards/${suit}_${rank}.svg`;
         const promise = new Promise<void>((resolve) => {
           textureLoader.load(path, (texture) => {
-            const material = new THREE.MeshLambertMaterial({ map: texture });
+            const material = new THREE.MeshLambertMaterial({ map: texture, transparent: true });
             this.materialCache.set(`${cardId}`, material);
             resolve();
           });

@@ -2,6 +2,7 @@
 import { BaseState } from './base-state';
 import { StateEnum } from './state.enum';
 import { EventEnum } from './event.enum';
+import { GameEvent } from './game/game-event.enum';
 
 export class StateMachine {
   private states: Map<StateEnum, BaseState> = new Map();
@@ -27,6 +28,13 @@ export class StateMachine {
     return this.states.values().next().value || null;
   }
   
+  public setInitialState(stateId: StateEnum): void {
+    if (!this.states.has(stateId)) {
+      throw new Error(`State with ID ${StateEnum[stateId]} not found in this state machine.`);
+    }
+    this.currentState = this.states.get(stateId)!;
+  }
+
   public start(): void {
     if (this.currentState === null) {
       this.currentState = this.getInitialState();
@@ -51,7 +59,7 @@ export class StateMachine {
     return true;
   }
 
-  public onEvent(event: EventEnum, ...args: any[]): boolean {
+  public onEvent(event: EventEnum | GameEvent, ...args: any[]): boolean {
     if (!this.currentState) {
       return false;
     }

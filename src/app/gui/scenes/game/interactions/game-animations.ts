@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import TWEEN from '@tweenjs/tween.js';
-import { GameConstants } from '../logic/game.constants';
+import { GameConstants } from '../../../../logic/game.constants';
 
 export class GameAnimations {
   static animateCardDeal(cards: THREE.Mesh[], positions: any[], timing: number): void {
@@ -38,14 +38,21 @@ export class GameAnimations {
   }
 
   static animateNonPlayableCardHover(card: THREE.Mesh, isHovering: boolean): void {
-    const initialX = card.userData['initialX'] || card.position.x;
+    const initialX = card.userData['initialX'] = card.userData['initialX'] || card.position.x;
+    
+    TWEEN.remove(card.userData['tween']);
+
     if (isHovering) {
-      card.userData['initialX'] = initialX;
-      new TWEEN.Tween(card.position)
+      card.userData['tween'] = new TWEEN.Tween(card.position)
         .to({ x: initialX + 0.1 }, 100)
         .easing(TWEEN.Easing.Quadratic.InOut)
         .yoyo(true)
         .repeat(1)
+        .start();
+    } else {
+      card.userData['tween'] = new TWEEN.Tween(card.position)
+        .to({ x: initialX }, 100)
+        .easing(TWEEN.Easing.Quadratic.Out)
         .start();
     }
   }

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { BaseScene } from '../base.scene';
-import { Card, Suit, Rank, CARD_VALUES } from './logic/schnapsen.rules';
-import { GameConstants } from './logic/game.constants';
+import { Card, Suit, Rank, CARD_VALUES } from '../../../logic/schnapsen.rules';
+import { GameConstants } from '../../../logic/game.constants';
 import { CardManager } from './cards/card-manager';
 import { CardLayout } from './cards/card-layout';
 import { GameInteractions } from './interactions/game-interactions';
@@ -9,6 +9,11 @@ import { GameAnimations } from './interactions/game-animations';
 import { MaterialFactory } from '../../utils/material.factory';
 import { UIUtils } from '../../utils/ui.utils';
 import { GUIStateManager, GUIState } from './state/gui-state-manager';
+import { GameStateService } from '../../../logic/game-state.service';
+import { GameSceneController } from './game-scene.controller';
+import { StateMachineManager } from '../../../sm/state-machine-manager';
+import { GameStateMachine } from '../../../sm/game/game-state-machine';
+import { GameEvent } from '../../../sm/game/game-event.enum';
 import TWEEN from '@tweenjs/tween.js';
 
 
@@ -17,11 +22,12 @@ export class GameScene extends BaseScene {
   public cardManager!: CardManager;
   private gameInteractions!: GameInteractions;
   public guiStateManager!: GUIStateManager;
-  private hoveredCard: THREE.Object3D | null = null;
+  private gameStateService!: GameStateService;
+  private gameSceneController!: GameSceneController;
+  private stateMachineManager!: StateMachineManager;
+    private hoveredCard: THREE.Object3D | null = null;
+  private hoveredCardPlayable: boolean = false;
 
-  // Game state
-  private deck!: Card[];
-  private trumpSuit!: Suit;
   
   // Card groups for easy management
   public playerHandGroup: THREE.Group = new THREE.Group();
@@ -46,35 +52,16 @@ export class GameScene extends BaseScene {
 
     await MaterialFactory.preloadAllMaterials();
 
-    this.deck = this.initializeDeck();
-    this.createCardGroups();
-    this.setupTable();
-    this.layoutCards(this.deck);
+    this.gameStateService = new GameStateService();
+    this.gameSceneController = new GameSceneController(this);
+    this.stateMachineManager = new StateMachineManager();
+    const gameSM = new GameStateMachine(this.gameStateService, this.stateMachineManager, this.gameSceneController);
+    this.stateMachineManager.registerStateMachine(gameSM);
 
-    const closeTalonButton = UIUtils.createButton('Close Talon', { width: 1, height: 0.5 }, {});
-    closeTalonButton.position.set(-4, 0, 0);
-    this.add(closeTalonButton);
-
-    const scoreLabel = UIUtils.createLabel('Score: 0', { x: -5, y: 3, z: 0 }, {});
-    this.add(scoreLabel);
+    this.stateMachineManager.startAll();
   }
 
 
-  private initializeDeck(): Card[] {
-    const deck: Card[] = [];
-    Object.values(Suit).forEach(suit => {
-      Object.values(Rank).forEach(rank => {
-        deck.push({
-          suit,
-          rank,
-          value: CARD_VALUES[rank],
-          id: `${suit}_${rank}`
-        });
-      });
-    });
-    
-    return this.cardManager.shuffleDeck(deck);
-  }
 
   private createCardGroups(): void {
     // Create groups for different card areas
@@ -115,43 +102,6 @@ export class GameScene extends BaseScene {
     this.add(table);
   }
 
-  private layoutCards(deck: Card[]): void {
-    const { player1Hand, player2Hand, talon } = this.cardManager.dealCards(deck);
-
-    const player1HandPositions = CardLayout.calculateHandPositions(player1Hand.length);
-    player1Hand.forEach((card: Card, i: number) => {
-      const cardMesh = this.cardManager.createCard(card, true);
-      cardMesh.position.set(player1HandPositions[i].x, player1HandPositions[i].y, player1HandPositions[i].z);
-      this.playerHandGroup.add(cardMesh);
-    });
-
-    const player2HandPositions = CardLayout.calculateHandPositions(player2Hand.length, 0.05);
-    player2Hand.forEach((card: Card, i: number) => {
-      const cardMesh = this.cardManager.createCard(card, false);
-      cardMesh.position.set(player2HandPositions[i].x, player2HandPositions[i].y + 5.5, player2HandPositions[i].z);
-      //cardMesh.scale.set(GameConstants.CARD_DIMENSIONS.OPPONENT_CARD_SCALE, GameConstants.CARD_DIMENSIONS.OPPONENT_CARD_SCALE, 1);
-      this.opponentHandGroup.add(cardMesh);
-    });
-
-    this.trumpSuit = talon[0].suit;
-    const trumpCard = talon.shift()!; // Remove trump card from talon
- 
-    const talonLayout = CardLayout.getTalonLayout();
- 
-    // Create and position the trump card
-    const trumpCardMesh = this.cardManager.createCard(trumpCard, true);
-    trumpCardMesh.rotation.z = Math.PI / 2;
-    trumpCardMesh.position.set(talonLayout.position.x + (GameConstants.CARD_DIMENSIONS.width / 1.4), talonLayout.position.y, talonLayout.position.z);
-
-    this.talonGroup.add(trumpCardMesh);
-
-     // Layout the rest of the talon
-     talon.forEach((card: Card, i: number) => {
-       const cardMesh = this.cardManager.createCard(card, false); // All other cards are face down
-       cardMesh.position.set(talonLayout.position.x, talonLayout.position.y, talonLayout.position.z + (i + 1) * 0.02);
-       this.talonGroup.add(cardMesh);
-     });
-  }
 
 
 
@@ -228,21 +178,17 @@ export class GameScene extends BaseScene {
     }
   }
 
+
   public onMouseEvent(mouse: THREE.Vector2): void {
     this.gameInteractions.handleCardClick(mouse, this.camera, (card) => {
-      this.onCardClick(card);
+      if (card.parent !== this.playerHandGroup) {
+        return;
+      }
+      const cardId = card.userData['card']?.id;
+      if (cardId) {
+        this.stateMachineManager.onEvent(GameEvent.PLAYER_CLICKED_CARD, { cardId });
+      }
     });
-  }
-
-  private onCardClick(card: THREE.Object3D): void {
-    // Example: highlight selected card
-    if (card.userData['selected']) {
-      card.position.y = GameConstants.HAND_POSITIONS.player1.y;
-      card.userData['selected'] = false;
-    } else {
-      card.position.y = GameConstants.HAND_POSITIONS.player1.y + 0.3;
-      card.userData['selected'] = true;
-    }
   }
 
   public update(): void {
@@ -251,15 +197,28 @@ export class GameScene extends BaseScene {
   }
 
   public onMouseMove(mouse: THREE.Vector2): void {
-    this.gameInteractions.handleCardHover(mouse, this.camera, (card, isPlayable) => {
+    this.gameInteractions.handleCardHover(mouse, this.camera, (intersectedCard, isPlayable) => {
+      let card: THREE.Object3D | null = intersectedCard;
+
+      // Only player cards can be hovered
+      if (card && card.parent !== this.playerHandGroup) {
+        card = null;
+      }
+      
+      // Case 1: Mouse is not over a new card, but a card was hovered before. Unhover it.
       if (this.hoveredCard && this.hoveredCard !== card) {
-        // Reset the previously hovered card
-        GameAnimations.animatePlayableCardHover(this.hoveredCard as THREE.Mesh, false);
+        if (this.hoveredCardPlayable) {
+          GameAnimations.animatePlayableCardHover(this.hoveredCard as THREE.Mesh, false);
+        } else {
+          GameAnimations.animateNonPlayableCardHover(this.hoveredCard as THREE.Mesh, false);
+        }
         this.hoveredCard = null;
       }
 
-      if (card && this.hoveredCard !== card) {
+      // Case 2: Mouse is over a new player card. Hover it.
+      if (card && card !== this.hoveredCard) {
         this.hoveredCard = card;
+        this.hoveredCardPlayable = isPlayable;
         if (isPlayable) {
           GameAnimations.animatePlayableCardHover(card as THREE.Mesh, true);
         } else {

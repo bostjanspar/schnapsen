@@ -1,6 +1,7 @@
 
 import { StateMachine } from './state-machine';
 import { EventEnum } from './event.enum';
+import { GameEvent } from './game/game-event.enum';
 
 export class StateMachineManager {
   private stateMachines: StateMachine[] = [];
@@ -22,13 +23,13 @@ export class StateMachineManager {
     }
   }
 
-  public onEvent(event: EventEnum, ...args: any[]): void {
+  public onEvent(event: EventEnum | GameEvent, ...args: any[]): void {
     for (const sm of this.stateMachines) {
       if (sm.onEvent(event, ...args)) {
         return; // Event consumed, stop propagation
       }
     }
-    console.warn(`Event ${EventEnum[event]} was not handled by any state machine.`);
+    console.warn(`Event ${event} was not handled by any state machine.`);
   }
 
   public startAll(): void {

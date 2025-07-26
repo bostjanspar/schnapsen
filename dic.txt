@@ -1,14 +1,16 @@
-@Screenshot.png This is the current view of the game. What the first problem is that a Trump under the Talon is missing. Can you locate this card and show it on a under talon where half of the card is visible  and rotated 90 degrees  to talon
 
 @rules.md This is a rules used for these games.
  Please do not implement any logic in GUI, this is just for you to understand how
  the game works and layout should look like. 
 
-
 @Screenshot.png This is the current view of the game.
 
-Make an opponent cards  a little bit smaller. To gain more space for my cards
- so that I can start using animations on mouse hover over the card 
- starting animation from current position up and again down. This animation is considered a player can play this card. aka YES 
- Next animation would be slowly left to right just for a few pixels and this animation should tell that player cannot play this card. aka NO
+At launching the game I get following error in the console. Take a look into the code and try to fix it. 
+
+
+Create new folder logic next to sm folder. That will contain all game logic needed for this game.
+ Look into the rules and see all the logic that is required for this game. 
+Then create root state machine for a  seven game points
  
+
+ first for the whole game. And then for each game that is being played and then still sub state for each three game where we will always check which card can be played and what should be done and you will communicate or state changes to game state machine. 
