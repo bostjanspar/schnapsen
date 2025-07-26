@@ -93,9 +93,11 @@ describe('StateMachineManager', () => {
         jest.spyOn(machine1, 'onEvent').mockReturnValue(false);
         jest.spyOn(machine2, 'onEvent').mockReturnValue(false);
 
+        
         stateMachineManager.onEvent(EventEnum.UNIT_TEST_DO_NOT_CONSUME_EVENT);
         
-        expect(consoleWarnSpy).toHaveBeenCalledWith('Event UNIT_TEST_DO_NOT_CONSUME_EVENT was not handled by any state machine.');
+        const enumNum = Number(EventEnum.UNIT_TEST_DO_NOT_CONSUME_EVENT);
+        expect(consoleWarnSpy).toHaveBeenCalledWith(`Event ${enumNum} was not handled by any state machine.`);
         consoleWarnSpy.mockRestore();
     });
   });
