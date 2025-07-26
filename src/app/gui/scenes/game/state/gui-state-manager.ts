@@ -82,7 +82,7 @@ export class GUIStateManager {
     if (!cardManager) return;
 
     if (layout === 'fan') {
-        const positions = CardLayout.calculateHandPositions(cards.length, {});
+        const positions = CardLayout.calculateHandPositions(cards.length);
         cards.forEach((card, i) => {
             const cardMesh = cardManager.createCard(card, group.name === 'playerHand');
             cardMesh.position.set(positions[i].x, positions[i].y, positions[i].z);
@@ -115,7 +115,7 @@ export class GUIStateManager {
     const dummyCard: Card = { id: 'dummy', suit: Suit.HEARTS, rank: Rank.ACE, value: 0 };
 
     if (layout === 'fan') {
-        const positions = CardLayout.calculateHandPositions(count, {});
+        const positions = CardLayout.calculateHandPositions(count);
         for (let i = 0; i < count; i++) {
             const cardMesh = cardManager.createCard(dummyCard, false);
             cardMesh.position.set(positions[i].x, positions[i].y + 5, positions[i].z);

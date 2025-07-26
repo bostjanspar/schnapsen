@@ -17,6 +17,7 @@ export class GameScene extends BaseScene {
   public cardManager!: CardManager;
   private gameInteractions!: GameInteractions;
   public guiStateManager!: GUIStateManager;
+  private hoveredCard: THREE.Object3D | null = null;
 
   // Game state
   private deck!: Card[];
@@ -117,29 +118,31 @@ export class GameScene extends BaseScene {
   private layoutCards(deck: Card[]): void {
     const { player1Hand, player2Hand, talon } = this.cardManager.dealCards(deck);
 
-    const player1HandPositions = CardLayout.calculateHandPositions(player1Hand.length, {});
+    const player1HandPositions = CardLayout.calculateHandPositions(player1Hand.length);
     player1Hand.forEach((card: Card, i: number) => {
       const cardMesh = this.cardManager.createCard(card, true);
       cardMesh.position.set(player1HandPositions[i].x, player1HandPositions[i].y, player1HandPositions[i].z);
       this.playerHandGroup.add(cardMesh);
     });
 
-    const player2HandPositions = CardLayout.calculateHandPositions(player2Hand.length, {});
+    const player2HandPositions = CardLayout.calculateHandPositions(player2Hand.length);
     player2Hand.forEach((card: Card, i: number) => {
       const cardMesh = this.cardManager.createCard(card, false);
       cardMesh.position.set(player2HandPositions[i].x, player2HandPositions[i].y + 5, player2HandPositions[i].z);
+      cardMesh.scale.set(GameConstants.CARD_DIMENSIONS.OPPONENT_CARD_SCALE, GameConstants.CARD_DIMENSIONS.OPPONENT_CARD_SCALE, 1);
       this.opponentHandGroup.add(cardMesh);
     });
 
     this.trumpSuit = talon[0].suit;
     const trumpCard = talon.shift()!; // Remove trump card from talon
  
-     const talonLayout = CardLayout.getTalonLayout();
+    const talonLayout = CardLayout.getTalonLayout();
  
     // Create and position the trump card
     const trumpCardMesh = this.cardManager.createCard(trumpCard, true);
-    trumpCardMesh.position.set(talonLayout.position.x, talonLayout.position.y - (GameConstants.CARD_DIMENSIONS.height / 4) , talonLayout.position.z);
     trumpCardMesh.rotation.z = Math.PI / 2;
+    trumpCardMesh.position.set(talonLayout.position.x + GameConstants.CARD_DIMENSIONS.width / 2, talonLayout.position.y, talonLayout.position.z);
+
     this.talonGroup.add(trumpCardMesh);
 
      // Layout the rest of the talon
@@ -248,8 +251,21 @@ export class GameScene extends BaseScene {
   }
 
   public onMouseMove(mouse: THREE.Vector2): void {
-    this.gameInteractions.handleCardHover(mouse, (card) => {
-      // Handle hover effect, e.g., by scaling the card
+    this.gameInteractions.handleCardHover(mouse, (card, isPlayable) => {
+      if (this.hoveredCard && this.hoveredCard !== card) {
+        // Reset the previously hovered card
+        GameAnimations.animatePlayableCardHover(this.hoveredCard as THREE.Mesh, false);
+        this.hoveredCard = null;
+      }
+
+      if (card && this.hoveredCard !== card) {
+        this.hoveredCard = card;
+        if (isPlayable) {
+          GameAnimations.animatePlayableCardHover(card as THREE.Mesh, true);
+        } else {
+          GameAnimations.animateNonPlayableCardHover(card as THREE.Mesh, true);
+        }
+      }
     });
   }
 

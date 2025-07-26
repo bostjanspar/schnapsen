@@ -23,19 +23,20 @@ export class GameInteractions {
     }
   }
 
-  public handleCardHover(mouse: THREE.Vector2, onCardHover: (card: THREE.Object3D | null) => void): void {
+  public handleCardHover(mouse: THREE.Vector2, onCardHover: (card: THREE.Object3D | null, isPlayable: boolean) => void): void {
     this.raycaster.setFromCamera(mouse, this.camera);
     const intersects = this.raycaster.intersectObjects(this.scene.children, true);
 
     if (intersects.length > 0) {
       const hoveredObject = intersects[0].object;
       if (hoveredObject.userData['card']) {
-        onCardHover(hoveredObject);
+        const isPlayable = this.validateMove(hoveredObject.userData['card'], {}); // Placeholder
+        onCardHover(hoveredObject, isPlayable);
       } else {
-        onCardHover(null);
+        onCardHover(null, false);
       }
     } else {
-      onCardHover(null);
+      onCardHover(null, false);
     }
   }
 

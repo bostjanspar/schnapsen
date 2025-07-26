@@ -1,7 +1,7 @@
 import { GameConstants } from '../logic/game.constants';
 
 export class CardLayout {
-  static calculateHandPositions(cardCount: number, area: any): any[] {
+  static calculateHandPositions(cardCount: number): any[] {
     const positions = [];
     for (let i = 0; i < cardCount; i++) {
       positions.push({

@@ -21,6 +21,35 @@ export class GameAnimations {
     // Implementation will go here
   }
 
+  static animatePlayableCardHover(card: THREE.Mesh, isHovering: boolean): void {
+    const initialY = card.userData['initialY'] || card.position.y;
+    if (isHovering) {
+      card.userData['initialY'] = initialY;
+      new TWEEN.Tween(card.position)
+        .to({ y: initialY + 0.5 }, 200)
+        .easing(TWEEN.Easing.Quadratic.Out)
+        .start();
+    } else {
+      new TWEEN.Tween(card.position)
+        .to({ y: initialY }, 200)
+        .easing(TWEEN.Easing.Quadratic.Out)
+        .start();
+    }
+  }
+
+  static animateNonPlayableCardHover(card: THREE.Mesh, isHovering: boolean): void {
+    const initialX = card.userData['initialX'] || card.position.x;
+    if (isHovering) {
+      card.userData['initialX'] = initialX;
+      new TWEEN.Tween(card.position)
+        .to({ x: initialX + 0.1 }, 100)
+        .easing(TWEEN.Easing.Quadratic.InOut)
+        .yoyo(true)
+        .repeat(1)
+        .start();
+    }
+  }
+
   static animateHandReorganization(hand: THREE.Group): void {
     hand.children.forEach(child => {
       if (child.userData['selected']) {
