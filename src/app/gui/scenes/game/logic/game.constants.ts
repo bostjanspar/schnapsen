@@ -14,7 +14,7 @@ export const GameConstants = {
     player2: { x: 0, y: 2.5, z: 0 },
   },
   TALON_LAYOUT: {
-    position: { x: -1, y: 0, z: 0 },
+    position: { x: -2.5, y: 0.5, z: 0 },
   },
   TRICK_AREA_LAYOUT: {
     position: { x: 1, y: 0, z: 0 },

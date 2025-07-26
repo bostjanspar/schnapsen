@@ -125,11 +125,11 @@ export class GameScene extends BaseScene {
       this.playerHandGroup.add(cardMesh);
     });
 
-    const player2HandPositions = CardLayout.calculateHandPositions(player2Hand.length);
+    const player2HandPositions = CardLayout.calculateHandPositions(player2Hand.length, 0.05);
     player2Hand.forEach((card: Card, i: number) => {
       const cardMesh = this.cardManager.createCard(card, false);
-      cardMesh.position.set(player2HandPositions[i].x, player2HandPositions[i].y + 5, player2HandPositions[i].z);
-      cardMesh.scale.set(GameConstants.CARD_DIMENSIONS.OPPONENT_CARD_SCALE, GameConstants.CARD_DIMENSIONS.OPPONENT_CARD_SCALE, 1);
+      cardMesh.position.set(player2HandPositions[i].x, player2HandPositions[i].y + 5.5, player2HandPositions[i].z);
+      //cardMesh.scale.set(GameConstants.CARD_DIMENSIONS.OPPONENT_CARD_SCALE, GameConstants.CARD_DIMENSIONS.OPPONENT_CARD_SCALE, 1);
       this.opponentHandGroup.add(cardMesh);
     });
 
@@ -141,7 +141,7 @@ export class GameScene extends BaseScene {
     // Create and position the trump card
     const trumpCardMesh = this.cardManager.createCard(trumpCard, true);
     trumpCardMesh.rotation.z = Math.PI / 2;
-    trumpCardMesh.position.set(talonLayout.position.x + GameConstants.CARD_DIMENSIONS.width / 2, talonLayout.position.y, talonLayout.position.z);
+    trumpCardMesh.position.set(talonLayout.position.x + (GameConstants.CARD_DIMENSIONS.width / 1.4), talonLayout.position.y, talonLayout.position.z);
 
     this.talonGroup.add(trumpCardMesh);
 
