@@ -11,3 +11,4 @@ Make an opponent cards  a little bit smaller. To gain more space for my cards
  so that I can start using animations on mouse hover over the card 
  starting animation from current position up and again down. This animation is considered a player can play this card. aka YES 
  Next animation would be slowly left to right just for a few pixels and this animation should tell that player cannot play this card. aka NO
+ 

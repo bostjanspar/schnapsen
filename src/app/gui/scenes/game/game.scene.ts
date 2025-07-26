@@ -131,14 +131,23 @@ export class GameScene extends BaseScene {
       this.opponentHandGroup.add(cardMesh);
     });
 
-    const talonLayout = CardLayout.getTalonLayout();
-    talon.forEach((card: Card, i: number) => {
-      const cardMesh = this.cardManager.createCard(card, i === 0);
-      cardMesh.position.set(talonLayout.position.x, talonLayout.position.y, talonLayout.position.z + i * 0.02);
-      this.talonGroup.add(cardMesh);
-    });
-
     this.trumpSuit = talon[0].suit;
+    const trumpCard = talon.shift()!; // Remove trump card from talon
+ 
+     const talonLayout = CardLayout.getTalonLayout();
+ 
+    // Create and position the trump card
+    const trumpCardMesh = this.cardManager.createCard(trumpCard, true);
+    trumpCardMesh.position.set(talonLayout.position.x, talonLayout.position.y - (GameConstants.CARD_DIMENSIONS.height / 4) , talonLayout.position.z);
+    trumpCardMesh.rotation.z = Math.PI / 2;
+    this.talonGroup.add(trumpCardMesh);
+
+     // Layout the rest of the talon
+     talon.forEach((card: Card, i: number) => {
+       const cardMesh = this.cardManager.createCard(card, false); // All other cards are face down
+       cardMesh.position.set(talonLayout.position.x, talonLayout.position.y, talonLayout.position.z + (i + 1) * 0.02);
+       this.talonGroup.add(cardMesh);
+     });
   }
 
 
