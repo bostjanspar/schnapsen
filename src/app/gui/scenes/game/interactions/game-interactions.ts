@@ -3,16 +3,14 @@ import { Card } from '../logic/schnapsen.rules';
 
 export class GameInteractions {
   private raycaster = new THREE.Raycaster();
-  private camera: THREE.Camera;
   private scene: THREE.Scene;
 
-  constructor(camera: THREE.Camera, scene: THREE.Scene) {
-    this.camera = camera;
+  constructor(scene: THREE.Scene) {
     this.scene = scene;
   }
 
-  public handleCardClick(mouse: THREE.Vector2, onCardClick: (card: THREE.Object3D) => void): void {
-    this.raycaster.setFromCamera(mouse, this.camera);
+  public handleCardClick(mouse: THREE.Vector2, camera: THREE.Camera, onCardClick: (card: THREE.Object3D) => void): void {
+    this.raycaster.setFromCamera(mouse, camera);
     const intersects = this.raycaster.intersectObjects(this.scene.children, true);
 
     if (intersects.length > 0) {
@@ -23,8 +21,8 @@ export class GameInteractions {
     }
   }
 
-  public handleCardHover(mouse: THREE.Vector2, onCardHover: (card: THREE.Object3D | null, isPlayable: boolean) => void): void {
-    this.raycaster.setFromCamera(mouse, this.camera);
+  public handleCardHover(mouse: THREE.Vector2, camera: THREE.Camera, onCardHover: (card: THREE.Object3D | null, isPlayable: boolean) => void): void {
+    this.raycaster.setFromCamera(mouse, camera);
     const intersects = this.raycaster.intersectObjects(this.scene.children, true);
 
     if (intersects.length > 0) {

@@ -42,7 +42,7 @@ export class GameScene extends BaseScene {
   public async initialize() {
     this.cardManager = new CardManager(this);
     this.guiStateManager = new GUIStateManager(this);
-    this.gameInteractions = new GameInteractions(this.camera, this);
+    this.gameInteractions = new GameInteractions(this);
 
     await MaterialFactory.preloadAllMaterials();
 
@@ -229,7 +229,7 @@ export class GameScene extends BaseScene {
   }
 
   public onMouseEvent(mouse: THREE.Vector2): void {
-    this.gameInteractions.handleCardClick(mouse, (card) => {
+    this.gameInteractions.handleCardClick(mouse, this.camera, (card) => {
       this.onCardClick(card);
     });
   }
@@ -251,7 +251,7 @@ export class GameScene extends BaseScene {
   }
 
   public onMouseMove(mouse: THREE.Vector2): void {
-    this.gameInteractions.handleCardHover(mouse, (card, isPlayable) => {
+    this.gameInteractions.handleCardHover(mouse, this.camera, (card, isPlayable) => {
       if (this.hoveredCard && this.hoveredCard !== card) {
         // Reset the previously hovered card
         GameAnimations.animatePlayableCardHover(this.hoveredCard as THREE.Mesh, false);
