@@ -1,21 +1,12 @@
 import * as THREE from 'three';
 import { BaseScene } from '../base.scene';
-import { Card, Suit, Rank, CARD_VALUES } from '../../../logic/schnapsen.rules';
 import { GameConstants } from '../../../logic/game.constants';
 import { CardManager } from './cards/card-manager';
-import { CardLayout } from './cards/card-layout';
 import { GameInteractions } from './interactions/game-interactions';
 import { GameAnimations } from './interactions/game-animations';
 import { MaterialFactory } from '../../utils/material.factory';
-import { UIUtils } from '../../utils/ui.utils';
 import { GUIStateManager, GUIState } from './state/gui-state-manager';
 import { ThreeService } from '../../services/three.service';
-import { GameStateService } from '../../../logic/game-state.service';
-import { RandomService } from '../../../logic/random.service';
-import { GameSceneController } from './game-scene.controller';
-import { StateMachineManager } from '../../../sm/state-machine-manager';
-import { GameStateMachine } from '../../../sm/game/game-state-machine';
-import { GameEvent } from '../../../sm/game/game-event.enum';
 import TWEEN from '@tweenjs/tween.js';
 
 
@@ -24,10 +15,7 @@ export class GameScene extends BaseScene {
   public cardManager!: CardManager;
   private gameInteractions!: GameInteractions;
   public guiStateManager!: GUIStateManager;
-  private gameStateService!: GameStateService;
-  private gameSceneController!: GameSceneController;
-  private stateMachineManager!: StateMachineManager;
-    private hoveredCard: THREE.Object3D | null = null;
+  private hoveredCard: THREE.Object3D | null = null;
   private hoveredCardPlayable: boolean = false;
 
   
@@ -41,27 +29,17 @@ export class GameScene extends BaseScene {
 
  
 
-  constructor() {
-    super();
+  constructor(protected override readonly camera: THREE.Camera) {     
+    super(camera);
     this.background = new THREE.Color(0x1a4a3a); // Dark green table color
-    this.allowMouseEvent = true;
   }
 
-  public override async initialize(threeService: ThreeService) {
+  public async initialize(threeService: ThreeService) {
     this.cardManager = new CardManager(this);
     this.guiStateManager = new GUIStateManager(this);
     this.gameInteractions = new GameInteractions(this);
 
     await MaterialFactory.preloadAllMaterials();
-
-    const randomService = new RandomService();
-    this.gameStateService = new GameStateService(randomService);
-    this.gameSceneController = new GameSceneController(this, threeService);
-    this.stateMachineManager = new StateMachineManager();
-    const gameSM = new GameStateMachine(this.gameStateService, this.stateMachineManager, this.gameSceneController);
-    this.stateMachineManager.registerStateMachine(gameSM);
-
-    this.stateMachineManager.startAll();
   }
 
 
@@ -104,8 +82,6 @@ export class GameScene extends BaseScene {
     table.name = 'table';
     this.add(table);
   }
-
-
 
 
 
@@ -189,7 +165,7 @@ export class GameScene extends BaseScene {
       }
       const cardId = card.userData['card']?.id;
       if (cardId) {
-        this.stateMachineManager.onEvent(GameEvent.PLAYER_CLICKED_CARD, { cardId });
+        //this.stateMachineManager.onEvent(GameEvent.PLAYER_CLICKED_CARD, { cardId });
       }
     });
   }

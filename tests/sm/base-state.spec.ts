@@ -1,7 +1,7 @@
-import { BaseState } from '@/sm/base-state';
-import { StateEnum } from '@/sm/state.enum';
-import { EventEnum } from '@/sm/event.enum';
-import { TestStateA, TestStateB } from '@test/fixtures/test-states';
+
+import { EventEnum } from '../../src/app/events/event.enum';
+import { StateEnum } from '../../src/app/sm/state.enum';
+import { TestStateA, TestStateB } from '../fixtures/test-states';
 
 describe('BaseState', () => {
   let testState: TestStateA;

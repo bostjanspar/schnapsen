@@ -11,12 +11,12 @@ export class SelectDealerScene extends BaseScene {
   private dealerCard!: THREE.Mesh;
   private arrow!: THREE.Mesh;
 
-  constructor() {
-    super();
+  constructor(protected override readonly camera: THREE.Camera) {
+    super(camera);
     this.background = new THREE.Color(0x1a4a3a);
   }
 
-  public override async initialize(dealerCardData: Card) {
+  public  async initialize(dealerCardData: Card) {
     this.cardManager = new CardManager(this);
     await MaterialFactory.preloadAllMaterials();
 

@@ -1,70 +1,31 @@
 
 import { BaseState } from './base-state';
 import { StateEnum } from './state.enum';
-import { EventEnum } from './event.enum';
-import { GameEvent } from './game/game-event.enum';
+import { SimpleEvent } from '../events/event.enum';
 
-export class StateMachine {
-  private states: Map<StateEnum, BaseState> = new Map();
-  private currentState: BaseState | null = null;
-  public priority: number;
 
-  constructor(priority: number = 0) {
-    this.priority = priority;
+ class RootState extends BaseState {
+  constructor(
+  ) {
+    super(StateEnum.ROOT);
+  }
+  onEntry(): void {    
   }
 
-  public addState(state: BaseState): void {
-    if (this.states.has(state.id)) {
-      throw new Error(`State with ID ${StateEnum[state.id]} already exists in this state machine.`);
-    }
-    this.states.set(state.id, state);
-  }
-
-  public getInitialState(): BaseState | null {
-    if (this.states.size === 0) {
-      return null;
-    }
-    // Return the first state added as the initial state
-    return this.states.values().next().value || null;
-  }
-  
-  public setInitialState(stateId: StateEnum): void {
-    if (!this.states.has(stateId)) {
-      throw new Error(`State with ID ${StateEnum[stateId]} not found in this state machine.`);
-    }
-    this.currentState = this.states.get(stateId)!;
+  onLeave(): void {
   }
 
   public start(): void {
-    if (this.currentState === null) {
-      this.currentState = this.getInitialState();
-      if (this.currentState) {
-        this.currentState.onEntry();
-      }
+    if (this.children.length === 0) {
+      throw new Error('Root state must have at least one child state.');
     }
+    this.activeSubstate = this.children[0];
+    this.children[0].onEntry()
   }
-
-  public transition(targetStateId: StateEnum): boolean {
-    if (!this.states.has(targetStateId)) {
-      console.warn(`Target state ${StateEnum[targetStateId]} not found in this state machine.`);
-      return false;
-    }
-
-    if (this.currentState) {
-      this.currentState.onLeave();
-    }
-
-    this.currentState = this.states.get(targetStateId)!;
-    this.currentState.onEntry();
-    return true;
-  }
-
-  public onEvent(event: EventEnum | GameEvent, ...args: any[]): boolean {
-    if (!this.currentState) {
-      return false;
-    }
-
-    let activeState: BaseState | null = this.currentState;
+  
+  public override onEvent(simpleEvent: SimpleEvent): boolean {
+    
+    let activeState: BaseState | null = this.activeSubstate;
     // @ts-ignore
     while (activeState && activeState.activeSubstate) {
         // @ts-ignore
@@ -74,12 +35,35 @@ export class StateMachine {
     // Hierarchical event handling from leaf to root
     let state: BaseState | null = activeState;
     while (state) {
-      if (state.onEvent(event, ...args)) {
+      if (state.onEvent(simpleEvent)) {
         return true; // Event consumed
       }
       state = state.parent;
     }
 
     return false; // Event not handled
+  }
+}
+
+export class StateMachine {
+  public priority: number;
+  private rootState: RootState = new RootState();
+
+  constructor(priority: number = 0) {
+    this.priority = priority;
+  }
+
+  public addState(state: BaseState): void {    
+    this.rootState.addSubstate(state);    
+  }
+
+
+  public start(): void {    
+    this.rootState.start();
+  }
+
+
+  public onEvent(simpleEvent: SimpleEvent): boolean {
+    return this.rootState.onEvent(simpleEvent);
   }
 }

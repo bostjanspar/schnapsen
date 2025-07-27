@@ -1,11 +1,11 @@
 import { BaseState } from '../../base-state';
 import { StateEnum } from '../../state.enum';
-import { GameSceneController } from '../../../gui/scenes/game/game-scene.controller';
-import { EventEnum } from '../../event.enum';
+import { GameStateMachine } from '../game-state-machine';
+
 
 export class FinalGameState extends BaseState {
   constructor(
-    private gameSceneController: GameSceneController
+    private machine: GameStateMachine
   ) {
     super(StateEnum.FINAL_GAME);
   }
@@ -15,9 +15,6 @@ export class FinalGameState extends BaseState {
     // this.gameSceneController.showWinnerBanner('Game Over');
   }
 
-  onEvent(event: EventEnum, ...args: any[]): boolean {
-      return false;
-  }
 
   onLeave(): void {
     console.log('Leaving FinalGameState');

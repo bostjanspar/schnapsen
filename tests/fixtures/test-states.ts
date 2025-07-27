@@ -1,6 +1,6 @@
 import { BaseState } from '../../src/app/sm/base-state';
 import { StateEnum } from '../../src/app/sm/state.enum';
-import { EventEnum } from '../../src/app/sm/event.enum';
+import { SimpleEvent } from '../../src/app/events/event.enum';
 
 export class TestStateA extends BaseState {
   public entryCallCount = 0;
@@ -21,7 +21,7 @@ export class TestStateA extends BaseState {
     this.leaveCallCount++;
   }
 
-  onEvent(event: EventEnum): boolean {
+  override onEvent(event: SimpleEvent): boolean {
     this.eventCallCount++;
     this.lastEvent = event;
     return event === EventEnum.UNIT_TEST_CONSUME_EVENT;

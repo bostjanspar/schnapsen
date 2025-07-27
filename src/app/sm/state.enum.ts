@@ -1,5 +1,6 @@
 export enum StateEnum {
   // Game States
+  GUI_STARTED,
   SELECT_DEALER,
   DEAL_CARDS,
   CURRENT_GAME,
@@ -7,6 +8,8 @@ export enum StateEnum {
   CHECK_GAME_POINTS,
   FINAL_GAME,
 
+  // root -> used in state machine
+  ROOT,
   // for testing purposes
   UNIT_TEST_STATE_A,
   UNIT_TEST_STATE_B,

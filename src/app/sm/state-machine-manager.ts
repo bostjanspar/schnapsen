@@ -1,6 +1,6 @@
 
 import { StateMachine } from './state-machine';
-import { EventEnum } from './event.enum';
+import { EventEnum, SimpleEvent } from '../events/event.enum';
 import { GameEvent } from './game/game-event.enum';
 
 export class StateMachineManager {
@@ -23,9 +23,9 @@ export class StateMachineManager {
     }
   }
 
-  public onEvent(event: EventEnum | GameEvent, ...args: any[]): void {
+  public onEvent(simpleEvent: SimpleEvent): void {
     for (const sm of this.stateMachines) {
-      if (sm.onEvent(event, ...args)) {
+      if (sm.onEvent(simpleEvent)) {
         return; // Event consumed, stop propagation
       }
     }

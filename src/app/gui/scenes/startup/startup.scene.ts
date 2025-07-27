@@ -5,10 +5,9 @@ import { UIUtils } from '../../utils/ui.utils';
 export class StartupScene extends BaseScene {
   private raycaster = new THREE.Raycaster();
 
-  constructor(private switchScene: () => void) {
-    super();
+  constructor(protected override readonly camera: THREE.Camera) {
+    super(camera);
     this.background = new THREE.Color(0xcccccc);
-    this.allowMouseEvent = true;
 
     const button = UIUtils.createButton('Start Game', { width: 2, height: 0.5 }, { backgroundColor: '#007bff' });
     button.name = 'startButton';
@@ -20,7 +19,7 @@ export class StartupScene extends BaseScene {
     const intersects = this.raycaster.intersectObjects(this.children);
 
     if (intersects.length > 0 && intersects[0].object.name === 'startButton') {
-      this.switchScene();
+
     }
   }
 

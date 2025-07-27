@@ -1,30 +1,31 @@
 import { BaseState } from '../../base-state';
 import { StateEnum } from '../../state.enum';
-import { GameStateService } from '../../../logic/game-state.service';
-import { StateMachine } from '../../state-machine';
-import { EventEnum } from '../../event.enum';
-
-import { GameSceneController } from '../../../gui/scenes/game/game-scene.controller';
+import {  SimpleEvent } from '../../../events/event.enum';
+import { GameStateMachine } from '../game-state-machine';
+import { Suit } from '../../../logic/schnapsen.rules';
 
 export class SelectDealerState extends BaseState {
   constructor(
-    private machine: StateMachine,
-    private gameStateService: GameStateService,
-    private gameSceneController: GameSceneController
+    private machine: GameStateMachine
   ) {
     super(StateEnum.SELECT_DEALER);
   }
 
   onEntry(): void {
-    const dealerCard = this.gameStateService.selectDealer();
-    this.gameSceneController.showSelectDealerScene(dealerCard);
+    if (this.machine.gameLogic.dealer$.getValue()< 0){      
+      const dealerCard = this.machine.gameLogic.selectDealer();
+      const newDealer = (dealerCard.suit  === Suit.HEARTS || (dealerCard.suit  === Suit.DIAMONDS) ) ? 0 : 1;
 
-    setTimeout(() => {
-      this.machine.transition(StateEnum.DEAL_CARDS);
-    }, 2000);
+      this.machine.gameLogic.dealer$.next(newDealer);
+      this.machine.guiController.electNewGameDealer(dealerCard, newDealer);
+    } else {
+      const previousDealer = this.machine.gameLogic.dealer$.getValue();
+      this.machine.gameLogic.dealer$.next( previousDealer === 0 ? 1 : 0);
+      this.machine.guiController.showNewGameDealer(this.machine.gameLogic.dealer$.getValue());
+    }
   }
-  
-  onEvent(event: EventEnum, ...args: any[]): boolean {
+
+  override onEvent(simpleEvent: SimpleEvent): boolean {
     return false;
   }
 

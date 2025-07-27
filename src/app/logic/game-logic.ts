@@ -3,10 +3,10 @@ import { BehaviorSubject } from 'rxjs';
 import { Card, Suit, Rank, CARD_VALUES } from './schnapsen.rules';
 import { RandomService } from './random.service';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class GameStateService {
+
+export class GameLogic {
+
+  public dealer$ = new BehaviorSubject<number>(-1);
   public playerPoints$ = new BehaviorSubject<number>(7);
   public opponentPoints$ = new BehaviorSubject<number>(7);
   public deck$ = new BehaviorSubject<Card[]>([]);
@@ -16,7 +16,9 @@ export class GameStateService {
   public trumpCard$ = new BehaviorSubject<Card | null>(null);
   public isTalonClosed$ = new BehaviorSubject<boolean>(false);
 
-  constructor(private randomService: RandomService) { }
+  constructor(private readonly randomService: RandomService) { 
+
+  }
 
   public selectDealer(): Card {
     const deck = this.initializeDeck();

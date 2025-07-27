@@ -5,6 +5,10 @@ import { StartupScene } from '../scenes/startup/startup.scene';
 import { SelectDealerScene } from '../scenes/select-dealer/select-dealer.scene';
 import { GameScene } from '../scenes/game/game.scene';
 import { BaseScene } from '../scenes/base.scene';
+import { GameStateMachine } from '../../sm/game/game-state-machine';
+import { RandomService } from '../../logic/random.service';
+import { GameLogic } from '../../logic/game-logic';
+import { GuiController } from '../scenes/gui-controller';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +20,7 @@ export class ThreeService {
   private scenes: Map<SchnapsenScene, BaseScene> = new Map();
   private activeScene!: BaseScene;
 
-  constructor() { }
+  constructor(private readonly randomService: RandomService) { }
 
   public async init(container: HTMLElement) {
     // Renderer
@@ -32,28 +36,30 @@ export class ThreeService {
     this.camera.position.z = 5;
 
     // Scenes
-    const gameScene = new GameScene();
+    const gameScene = new GameScene(this.camera);
     await gameScene.initialize(this);
 
-    this.scenes.set(SchnapsenScene.Startup, new StartupScene(() => this.setActiveScene(SchnapsenScene.Game)));
-    this.scenes.set(SchnapsenScene.SelectDealer, new SelectDealerScene());
+    this.scenes.set(SchnapsenScene.Startup, new StartupScene(this.camera));
+    this.scenes.set(SchnapsenScene.SelectDealer, new SelectDealerScene(this.camera));
     this.scenes.set(SchnapsenScene.Game, gameScene);
-    this.scenes.forEach(scene => scene.camera = this.camera);
+    
 
     this.setupLighting();
 
-    this.setActiveScene(SchnapsenScene.Game);
+    this.setActiveScene(SchnapsenScene.Startup);
 
     this.animate();
-
     window.addEventListener('resize', this.onResize);
+
+   
+    new GameStateMachine(
+      new GameLogic(this.randomService),
+      new GuiController(this)      
+    );
   }
 
   public setActiveScene(scene: SchnapsenScene, ...args: any[]) {
-    this.activeScene = this.scenes.get(scene)!;
-    if (this.activeScene.initialize) {
-      this.activeScene.initialize(...args);
-    }
+    this.activeScene = this.scenes.get(scene)!;    
   }
 
   private setupLighting() {
@@ -84,7 +90,6 @@ export class ThreeService {
   }
 
   public handleInteraction(event: MouseEvent) {
-    if (!this.activeScene.allowMouseEvent) return;
 
     const mouse = new THREE.Vector2();
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -94,7 +99,8 @@ export class ThreeService {
   }
 
   public handleMouseMove(event: MouseEvent) {
-    if (!this.activeScene.allowMouseEvent) return;
+    if (!this.activeScene) return;
+
 
     const mouse = new THREE.Vector2();
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
