@@ -12,6 +12,7 @@ export class SelectDealerState extends BaseState {
   }
 
   onEntry(): void {
+    console.log('Entering SelectDealerState');
     if (this.machine.gameLogic.dealer$.getValue()< 0){      
       const dealerCard = this.machine.gameLogic.selectDealer();
       const newDealer = (dealerCard.suit  === Suit.HEARTS || (dealerCard.suit  === Suit.DIAMONDS) ) ? 0 : 1;

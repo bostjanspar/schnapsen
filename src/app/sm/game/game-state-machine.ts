@@ -10,6 +10,7 @@ import { FinalGameState } from './states/final-game.state';
 import { GuiController } from '../../gui/scenes/gui-controller';
 import { RandomService } from '../../logic/random.service';
 import { GameLogic } from '../../logic/game-logic';
+import { GuiStartedState } from './states/gui-started.state';
 
 export class GameStateMachine extends StateMachine {
   
@@ -17,7 +18,8 @@ export class GameStateMachine extends StateMachine {
     public readonly gameLogic: GameLogic,
     public readonly guiController: GuiController) {
     super();
-
+    
+    this.addState(new GuiStartedState(this));
     this.addState(new SelectDealerState(this));
     this.addState(new DealCardsState(this));
     this.addState(new CurrentGameState(this));

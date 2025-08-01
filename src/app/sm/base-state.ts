@@ -1,9 +1,7 @@
 
 import { StateEnum } from './state.enum';
-import { EventEnum, SimpleEvent } from '../events/event.enum';
-import { GameEvent } from './game/game-event.enum';
-import { StateMachine } from './state-machine';
-import { MarchingCubes } from 'three/examples/jsm/Addons.js';
+import { SimpleEvent } from '../events/event.enum';
+
 
 export abstract class BaseState {  
   public parent: BaseState | null = null;
@@ -38,20 +36,29 @@ export abstract class BaseState {
   }
 
   // Basic transition logic within the scope of the state's children
-  public transition(targetStateId: StateEnum): boolean {
+  public transition(targetStateId: StateEnum) {
     if(this.parent){
-      return this.parent.transition(targetStateId);
+      const parentMachine = this.parent;
+      parentMachine._findTransition(targetStateId).then((foundState) => {
+        if (foundState) {
+          parentMachine._internalTransition(foundState);
+        } else {
+          throw new Error(`State with ID ${StateEnum[targetStateId]} does not exist under state ${StateEnum[this.id]}.`);
+        }
+      });
     }
-    return false;
-
   }
 
+  // This method is for internal use only, it should not be called directly
+  private _findTransition(targetStateId: StateEnum): Promise<BaseState | null> {
+    return new Promise((resolve) => {
+      const foundState = this.children.find(child => child.id === targetStateId);
+      resolve(foundState || null);
+    });
+  }
+  // This method is for internal use only, it should not be called directly
   // Internal transition logic never call this method unless you are really sure what are you doing
-  private _internalTransition(targetStateId: StateEnum): boolean {
-    let transToState = this.children.find(child => child.id === targetStateId);
-    if (!transToState) {
-      throw new Error(`State with ID ${StateEnum[targetStateId]} does not exist under state ${StateEnum[this.id]}.`);
-    }
+  private _internalTransition(transToState: BaseState): boolean {
 
     let activeState= this.activeSubstate;
     while (activeState) {

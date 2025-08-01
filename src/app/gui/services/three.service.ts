@@ -9,6 +9,8 @@ import { GameStateMachine } from '../../sm/game/game-state-machine';
 import { RandomService } from '../../logic/random.service';
 import { GameLogic } from '../../logic/game-logic';
 import { GuiController } from '../scenes/gui-controller';
+import { Subject } from 'rxjs';
+import { SimpleEvent } from '../../events/event.enum';
 
 @Injectable({
   providedIn: 'root'
@@ -35,11 +37,14 @@ export class ThreeService {
     this.camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
     this.camera.position.z = 5;
 
+    const eventSubject = new Subject<SimpleEvent>();
+
+
     // Scenes
     const gameScene = new GameScene(this.camera);
     await gameScene.initialize(this);
 
-    this.scenes.set(SchnapsenScene.Startup, new StartupScene(this.camera));
+    this.scenes.set(SchnapsenScene.Startup, new StartupScene(eventSubject, this.camera));
     this.scenes.set(SchnapsenScene.SelectDealer, new SelectDealerScene(this.camera));
     this.scenes.set(SchnapsenScene.Game, gameScene);
     
@@ -52,10 +57,15 @@ export class ThreeService {
     window.addEventListener('resize', this.onResize);
 
    
-    new GameStateMachine(
+    const sm = new GameStateMachine(
       new GameLogic(this.randomService),
       new GuiController(this)      
     );
+
+    eventSubject.subscribe(event => {
+      sm.onEvent(event);
+    });
+   
   }
 
   public setActiveScene(scene: SchnapsenScene, ...args: any[]) {

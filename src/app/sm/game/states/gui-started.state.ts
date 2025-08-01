@@ -16,8 +16,9 @@ export class GuiStartedState extends BaseState {
   }
 
   override onEvent(simpleEvent: SimpleEvent): boolean {
-      if (simpleEvent.type == EventEnum.GUI_STARTED_EVENT){
+      if (simpleEvent.type == EventEnum.START_GAME) {
         this.transition(StateEnum.SELECT_DEALER)
+        console.log('Transitioning to SelectDealerState');
         return true;
       }
       return false;

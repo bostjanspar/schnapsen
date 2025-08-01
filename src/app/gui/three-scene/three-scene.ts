@@ -41,4 +41,23 @@ export class ThreeSceneComponent implements OnInit {
   onMouseMove(event: MouseEvent) {
     this.threeService.handleMouseMove(event);
   }
+
+  @HostListener('window:touchstart', ['$event'])
+  onTouchStart(event: TouchEvent) {
+    // Interpret the first touch as a mouse click
+    if (event.touches.length > 0) {
+      // Create a synthetic MouseEvent using the first touch point
+      const touch = event.touches[0];
+      const mouseEvent = new MouseEvent('click', {
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+        screenX: touch.screenX,
+        screenY: touch.screenY,
+        bubbles: true,
+        cancelable: true,
+        view: window
+      });
+      this.threeService.handleInteraction(mouseEvent);
+    }
+  }
 }

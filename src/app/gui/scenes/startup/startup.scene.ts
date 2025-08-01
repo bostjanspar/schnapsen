@@ -1,11 +1,13 @@
 import * as THREE from 'three';
 import { BaseScene } from '../base.scene';
 import { UIUtils } from '../../utils/ui.utils';
+import { Subject } from 'rxjs';
+import { EventEnum, SimpleEvent } from '../../../events/event.enum';
 
 export class StartupScene extends BaseScene {
   private raycaster = new THREE.Raycaster();
 
-  constructor(protected override readonly camera: THREE.Camera) {
+  constructor(private readonly eventPush: Subject<SimpleEvent>, protected override readonly camera: THREE.Camera) {
     super(camera);
     this.background = new THREE.Color(0xcccccc);
 
@@ -19,7 +21,7 @@ export class StartupScene extends BaseScene {
     const intersects = this.raycaster.intersectObjects(this.children);
 
     if (intersects.length > 0 && intersects[0].object.name === 'startButton') {
-
+      this.eventPush.next(new SimpleEvent(EventEnum.START_GAME));
     }
   }
 
