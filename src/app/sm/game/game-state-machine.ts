@@ -8,7 +8,6 @@ import { EndOfHandAnimationState } from './states/end-of-hand-animation.state';
 import { CheckGamePointsState } from './states/check-game-points.state';
 import { FinalGameState } from './states/final-game.state';
 import { GuiController } from '../../gui/scenes/gui-controller';
-import { RandomService } from '../../logic/random.service';
 import { GameLogic } from '../../logic/game-logic';
 import { GuiStartedState } from './states/gui-started.state';
 

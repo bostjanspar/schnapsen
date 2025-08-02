@@ -68,8 +68,9 @@ export class ThreeService {
    
   }
 
-  public setActiveScene(scene: SchnapsenScene, ...args: any[]) {
-    this.activeScene = this.scenes.get(scene)!;    
+  public setActiveScene(scene: SchnapsenScene): BaseScene  {
+    this.activeScene = this.scenes.get(scene)!;
+    return this.activeScene;    
   }
 
   private setupLighting() {

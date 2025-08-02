@@ -12,9 +12,6 @@ export class GameSceneController {
    
   }
 
-  public showSelectDealerScene(dealerCard: Card): void {
-    this.threeService.setActiveScene(SchnapsenScene.SelectDealer, dealerCard);
-  }
 
   public displayHands(playerCards: Card[], opponentCards: Card[]): void {
     const playerHandPositions = CardLayout.calculateHandPositions(playerCards.length);

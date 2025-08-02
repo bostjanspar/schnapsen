@@ -20,9 +20,9 @@ export class SelectDealerState extends BaseState {
       this.machine.gameLogic.dealer$.next(newDealer);
       this.machine.guiController.electNewGameDealer(dealerCard, newDealer);
     } else {
-      const previousDealer = this.machine.gameLogic.dealer$.getValue();
-      this.machine.gameLogic.dealer$.next( previousDealer === 0 ? 1 : 0);
-      this.machine.guiController.showNewGameDealer(this.machine.gameLogic.dealer$.getValue());
+      const newDealer = this.machine.gameLogic.dealer$.getValue() === 0 ? 1 : 0;
+      this.machine.gameLogic.dealer$.next( newDealer);
+      this.machine.guiController.electNewGameDealer(null, newDealer);
     }
   }
 

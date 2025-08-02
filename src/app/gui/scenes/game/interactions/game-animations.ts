@@ -64,24 +64,4 @@ export class GameAnimations {
       }
     });
   }
-
-  static animateArrowUp(arrow: THREE.Mesh): void {
-      const initialY = arrow.position.y;
-      new TWEEN.Tween(arrow.position)
-          .to({ y: initialY + 0.5 }, 500)
-          .easing(TWEEN.Easing.Quadratic.InOut)
-          .yoyo(true)
-          .repeat(Infinity)
-          .start();
-  }
-
-  static animateArrowDown(arrow: THREE.Mesh): void {
-      const initialY = arrow.position.y;
-      new TWEEN.Tween(arrow.position)
-          .to({ y: initialY - 0.5 }, 500)
-          .easing(TWEEN.Easing.Quadratic.InOut)
-          .yoyo(true)
-          .repeat(Infinity)
-          .start();
-  }
 }

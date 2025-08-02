@@ -10,10 +10,10 @@ export class UIUtils {
     return button;
   }
 
-  static createLabel(text: string, position: any, style: any): THREE.Mesh {
-    const texture = TextureUtils.createTextTexture(text, style);
+  static createLabel(text: string, size: any, position: any, style: any): THREE.Mesh {
+    const texture = TextureUtils.createTextTextureLabel(text, style);
     const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
-    const geometry = new THREE.PlaneGeometry(1, 0.5);
+    const geometry = new THREE.PlaneGeometry(size.width, size.height);
     const label = new THREE.Mesh(geometry, material);
     label.position.set(position.x, position.y, position.z);
     return label;
