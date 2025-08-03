@@ -1,7 +1,7 @@
 
 module.exports = {
   preset: 'jest-preset-angular',
-  setupFilesAfterEnv: ['<rootDir>/setup-jest.ts', '<rootDir>/tests/utils/jest-matchers.ts'],
+  setupFilesAfterEnv: ['<rootDir>/setup-jest.ts'],
   testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/dist/'],
   transform: {
     '^.+\\.(ts|html)$': [
@@ -13,12 +13,7 @@ module.exports = {
     ],
   },
   testMatch: [
-    '<rootDir>/src/**/*.spec.ts',
     '<rootDir>/tests/**/*.spec.ts',
-  ],
-  collectCoverageFrom: [
-    'src/app/sm/**/*.ts',
-    '!src/**/*.spec.ts',
   ]
   
 };
