@@ -29,6 +29,10 @@ export class MaterialFactory {
   }
 
   static async preloadAllMaterials(): Promise<void> {
+    if (this.materialCache.size > 0) {
+      return; // Materials already preloaded
+    }
+
     const textureLoader = new THREE.TextureLoader();
     const promises = [];
 
