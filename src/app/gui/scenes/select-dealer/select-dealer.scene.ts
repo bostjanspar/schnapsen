@@ -6,7 +6,7 @@ import { CardManager } from '../game/cards/card-manager';
 import { MaterialFactory } from '../../utils/material.factory';
 import { UIUtils } from '../../utils/ui.utils';
 import { Subject } from 'rxjs';
-import { SimpleEvent } from '../../../events/event.enum';
+import { EventEnum, SimpleEvent } from '../../../events/event.enum';
 
 export class SelectDealerScene extends BaseScene {
   private arrow!: THREE.Mesh;
@@ -94,7 +94,7 @@ private animateArrow(up: boolean): void {
         })
         .onComplete(() => {
             this.arrow.position.y = initialY; // Reset to original position
-            console.log('Animation is done');
+            this.eventPush.next(new SimpleEvent(EventEnum.DEALER_SELECTED));
         })
         .start();
   }

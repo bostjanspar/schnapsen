@@ -1,6 +1,8 @@
 export enum EventEnum {
   GUI_STARTED_EVENT= 'GUI_STARTED_EVENT',
   START_GAME = 'START_GAME',
+  DEALER_SELECTED = 'DEALER_SELECTED',
+
 
 
  // Unit tests

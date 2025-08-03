@@ -40,9 +40,11 @@ export class GameScene extends BaseScene {
     this.gameInteractions = new GameInteractions(this);
 
     await MaterialFactory.preloadAllMaterials();
+    this.setupTable();
+    this.createCardGroups();
+    console.log('GameScene initialized');
+  
   }
-
-
 
   private createCardGroups(): void {
     // Create groups for different card areas

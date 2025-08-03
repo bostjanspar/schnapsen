@@ -39,17 +39,8 @@ export class ThreeService {
     this.camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
     this.camera.position.z = 5;
 
-    
+   
 
-
-    // Scenes
-    const gameScene = new GameScene(this.camera);
-    await gameScene.initialize(this);
-
-    // this.scenes.set(SchnapsenScene.Startup, new StartupScene(this.eventSubject, this.camera));
-    // this.scenes.set(SchnapsenScene.SelectDealer, new SelectDealerScene(this.camera));
-    // this.scenes.set(SchnapsenScene.Game, gameScene);
-    
     this.setActiveScene(SchnapsenScene.Startup);
     this.animate();
     window.addEventListener('resize', this.onResize);
@@ -80,8 +71,12 @@ export class ThreeService {
         return new StartupScene(this.eventSubject, this.camera);
       case SchnapsenScene.SelectDealer:
         return new SelectDealerScene(this.eventSubject, this.camera);
-      case SchnapsenScene.Game:
-        return new GameScene(this.camera);
+      case SchnapsenScene.Game:{
+         // Scenes
+        const gameScene = new GameScene(this.camera);
+        gameScene.initialize(this);
+        return gameScene;
+      }
       default:
         throw new Error(`Scene ${sceneEnum} not implemented`);  
     }

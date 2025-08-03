@@ -1,6 +1,6 @@
 import { BaseState } from '../../base-state';
 import { StateEnum } from '../../state.enum';
-import {  SimpleEvent } from '../../../events/event.enum';
+import {  EventEnum, SimpleEvent } from '../../../events/event.enum';
 import { GameStateMachine } from '../game-state-machine';
 import { Suit } from '../../../logic/schnapsen.rules';
 
@@ -27,6 +27,11 @@ export class SelectDealerState extends BaseState {
   }
 
   override onEvent(simpleEvent: SimpleEvent): boolean {
+    if (simpleEvent.type == EventEnum.DEALER_SELECTED) {
+          this.transition(StateEnum.DEAL_CARDS)
+          console.log('Transitioning to DealCardsState');
+          return true;
+      }
     return false;
   }
 

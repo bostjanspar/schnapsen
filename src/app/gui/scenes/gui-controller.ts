@@ -3,8 +3,10 @@ import { ThreeService } from '../services/three.service';
 import { Card } from '../../logic/schnapsen.rules';
 import { SchnapsenScene } from './schnapsen-scene.enum';
 import { SelectDealerScene } from './select-dealer/select-dealer.scene';
+import { GameScene } from './game/game.scene';
 
-export class GuiController{  
+export class GuiController{
+
   constructor(private readonly threeService: ThreeService) {
   }
 
@@ -18,4 +20,11 @@ export class GuiController{
     console.log(`Electing new dealer: ${newDealer} with card ${dealerCard}`);
     selectDealerScene.initialize(dealerCard, newDealer ? true : false);
   }
+
+  dealTheCards() {
+    const scene =  this.threeService.setActiveScene(SchnapsenScene.Game);
+    if (!(scene instanceof GameScene)) {
+       throw new Error('Active scene is not GameScene');
+    }
+  }  
 }

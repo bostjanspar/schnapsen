@@ -11,6 +11,8 @@ export class DealCardsState extends BaseState {
 
   onEntry(): void {
     console.log('Entering DealCardsState');
+
+     this.machine.guiController.dealTheCards();
     // this.gameStateService.prepareNewHand();
     // const { playerHand, opponentHand } = this.gameStateService.getCurrentHands();
     // this.gameSceneController.displayHands(playerHand, opponentHand);
