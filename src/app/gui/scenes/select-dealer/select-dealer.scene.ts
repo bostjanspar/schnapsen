@@ -5,11 +5,14 @@ import { Card } from '../../../logic/schnapsen.rules';
 import { CardManager } from '../game/cards/card-manager';
 import { MaterialFactory } from '../../utils/material.factory';
 import { UIUtils } from '../../utils/ui.utils';
+import { Subject } from 'rxjs';
+import { SimpleEvent } from '../../../events/event.enum';
 
 export class SelectDealerScene extends BaseScene {
   private arrow!: THREE.Mesh;
 
-  constructor(protected override readonly camera: THREE.Camera) {
+  constructor(private readonly eventPush: Subject<SimpleEvent>,
+    protected override readonly camera: THREE.Camera) {
     super(camera);
     this.background = new THREE.Color(0x1a4a3a);
   }

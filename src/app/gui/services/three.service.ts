@@ -16,11 +16,13 @@ import { SimpleEvent } from '../../events/event.enum';
   providedIn: 'root'
 })
 export class ThreeService {
+
   private camera!: THREE.PerspectiveCamera;
   private renderer!: THREE.WebGLRenderer;
 
-  private scenes: Map<SchnapsenScene, BaseScene> = new Map();
   private activeScene!: BaseScene;
+
+  private eventSubject = new Subject<SimpleEvent>();
 
   constructor(private readonly randomService: RandomService) { }
 
@@ -37,22 +39,18 @@ export class ThreeService {
     this.camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
     this.camera.position.z = 5;
 
-    const eventSubject = new Subject<SimpleEvent>();
+    
 
 
     // Scenes
     const gameScene = new GameScene(this.camera);
     await gameScene.initialize(this);
 
-    this.scenes.set(SchnapsenScene.Startup, new StartupScene(eventSubject, this.camera));
-    this.scenes.set(SchnapsenScene.SelectDealer, new SelectDealerScene(this.camera));
-    this.scenes.set(SchnapsenScene.Game, gameScene);
+    // this.scenes.set(SchnapsenScene.Startup, new StartupScene(this.eventSubject, this.camera));
+    // this.scenes.set(SchnapsenScene.SelectDealer, new SelectDealerScene(this.camera));
+    // this.scenes.set(SchnapsenScene.Game, gameScene);
     
-
-    this.setupLighting();
-
     this.setActiveScene(SchnapsenScene.Startup);
-
     this.animate();
     window.addEventListener('resize', this.onResize);
 
@@ -62,26 +60,41 @@ export class ThreeService {
       new GuiController(this)      
     );
 
-    eventSubject.subscribe(event => {
+    this.eventSubject.subscribe(event => {
       sm.onEvent(event);
     });
    
   }
 
   public setActiveScene(scene: SchnapsenScene): BaseScene  {
-    this.activeScene = this.scenes.get(scene)!;
-    return this.activeScene;    
+    const newScene = this.buildScenes(scene);
+    this.setupLighting(newScene);
+
+    this.activeScene = newScene
+    return newScene;    
   }
 
-  private setupLighting() {
+  private buildScenes(sceneEnum: SchnapsenScene) : BaseScene {
+    switch (sceneEnum) {
+      case SchnapsenScene.Startup:
+        return new StartupScene(this.eventSubject, this.camera);
+      case SchnapsenScene.SelectDealer:
+        return new SelectDealerScene(this.eventSubject, this.camera);
+      case SchnapsenScene.Game:
+        return new GameScene(this.camera);
+      default:
+        throw new Error(`Scene ${sceneEnum} not implemented`);  
+    }
+  }
+
+  private setupLighting(scene: BaseScene ) {
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
     directionalLight.position.set(0, 1, 1);
 
-    this.scenes.forEach(scene => {
-      scene.add(ambientLight.clone());
-      scene.add(directionalLight.clone());
-    });
+    scene.add(ambientLight.clone());
+    scene.add(directionalLight.clone());
+  
   }
 
   private animate = () => {
