@@ -1,4 +1,4 @@
-import { MaterialFactory } from '../../../gui/utils/material.factory';
+
 import { BaseState } from '../../base-state';
 import { StateEnum } from '../../state.enum';
 import { GameStateMachine } from '../game-state-machine';
@@ -15,10 +15,9 @@ export class DealCardsState extends BaseState {
      const gameLogic = this.machine.gameLogic;
      gameLogic.prepareNewHand();
 
-     MaterialFactory.preloadAllMaterials().then(() => {
+    
        this.machine.guiController.dealTheCards(gameLogic.playerHand$.getValue(),
           gameLogic.opponentHand$.getValue());
-    });
   }
 
   onLeave(): void {
