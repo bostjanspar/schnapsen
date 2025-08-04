@@ -67,11 +67,4 @@ export class GameLogic {
     this.trumpCard$.next(trumpCard);
     this.deck$.next(deck);
   }
-
-  public getCurrentHands(): { playerHand: Card[], opponentHand: Card[] } {
-    return {
-      playerHand: this.playerHand$.getValue(),
-      opponentHand: this.opponentHand$.getValue()
-    };
-  }
 }

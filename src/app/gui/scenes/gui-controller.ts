@@ -21,10 +21,13 @@ export class GuiController{
     selectDealerScene.initialize(dealerCard, newDealer ? true : false);
   }
 
-  dealTheCards() {
+  dealTheCards(playerCards: Card[], opponentCards: Card[]) {
+   
     const scene =  this.threeService.setActiveScene(SchnapsenScene.Game);
     if (!(scene instanceof GameScene)) {
        throw new Error('Active scene is not GameScene');
     }
+
+    scene.displayHands(playerCards, opponentCards);
   }  
 }

@@ -8,6 +8,8 @@ import { MaterialFactory } from '../../utils/material.factory';
 import { GUIStateManager, GUIState } from './state/gui-state-manager';
 import { ThreeService } from '../../services/three.service';
 import TWEEN from '@tweenjs/tween.js';
+import { Card } from '../../../logic/schnapsen.rules';
+import { CardLayout } from './cards/card-layout';
 
 
 
@@ -31,7 +33,8 @@ export class GameScene extends BaseScene {
 
   constructor(protected override readonly camera: THREE.Camera) {     
     super(camera);
-    this.background = new THREE.Color(0x1a4a3a); // Dark green table color
+    //this.background = new THREE.Color(0x1a4a3a); // Dark green table color
+    this.background = new THREE.Color(0x111111);
   }
 
   public async initialize(threeService: ThreeService) {
@@ -85,6 +88,26 @@ export class GameScene extends BaseScene {
     this.add(table);
   }
 
+  
+  public displayHands(playerCards: Card[], opponentCards: Card[]): void {
+    this.playerHandGroup.clear();
+    const playerHandPositions = CardLayout.calculateHandPositions(playerCards.length);
+    playerCards.forEach((card, i) => {
+      const cardMesh = this.cardManager.createCard(card, true);
+      cardMesh.position.set(playerHandPositions[i].x, playerHandPositions[i].y, playerHandPositions[i].z);
+      this.playerHandGroup.add(cardMesh);
+      this.add(cardMesh);
+    });
+
+     this.opponentHandGroup.clear();
+    const opponentHandPositions = CardLayout.calculateHandPositions(opponentCards.length, 0.05);
+    opponentCards.forEach((card, i) => {
+        const cardMesh = this.cardManager.createCard(card, false);
+        cardMesh.position.set(opponentHandPositions[i].x, opponentHandPositions[i].y + 5.5, opponentHandPositions[i].z);
+        this.opponentHandGroup.add(cardMesh);
+        this.add(cardMesh);
+    });
+  }
 
 
   public playCardToTrick(cardName: string, isPlayer: boolean): void {

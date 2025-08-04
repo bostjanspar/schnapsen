@@ -18,9 +18,10 @@ export class GameStateMachine extends StateMachine {
     public readonly guiController: GuiController) {
     super();
     
+    this.addState(new DealCardsState(this));
     this.addState(new GuiStartedState(this));
     this.addState(new SelectDealerState(this));
-    this.addState(new DealCardsState(this));
+    //this.addState(new DealCardsState(this));
     this.addState(new CurrentGameState(this));
     this.addState(new EndOfHandAnimationState(this));
     this.addState(new CheckGamePointsState(this));
