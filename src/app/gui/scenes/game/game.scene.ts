@@ -46,32 +46,28 @@ export class GameScene extends BaseScene {
     this.setupTable();
     this.createCardGroups();
     console.log('GameScene initialized');
-  
+    
   }
 
   private createCardGroups(): void {
     // Create groups for different card areas
-    this.playerHandGroup = new THREE.Group();
     this.playerHandGroup.name = 'playerHand';
+    this.playerHandGroup.visible = true;
     this.add(this.playerHandGroup);
 
-    this.opponentHandGroup = new THREE.Group();
     this.opponentHandGroup.name = 'opponentHand';
     this.add(this.opponentHandGroup);
 
-    this.talonGroup = new THREE.Group();
     this.talonGroup.name = 'talon';
     this.add(this.talonGroup);
 
-    this.currentTrickGroup = new THREE.Group();
     this.currentTrickGroup.name = 'currentTrick';
     this.add(this.currentTrickGroup);
 
-    this.playerTricksGroup = new THREE.Group();
     this.playerTricksGroup.name = 'playerTricks';
     this.add(this.playerTricksGroup);
 
-    this.opponentTricksGroup = new THREE.Group();
+
     this.opponentTricksGroup.name = 'opponentTricks';
     this.add(this.opponentTricksGroup);
   }
@@ -96,16 +92,16 @@ export class GameScene extends BaseScene {
       const cardMesh = this.cardManager.createCard(card, true);
       cardMesh.position.set(playerHandPositions[i].x, playerHandPositions[i].y, playerHandPositions[i].z);
       this.playerHandGroup.add(cardMesh);
-      this.add(cardMesh);
+
     });
 
-     this.opponentHandGroup.clear();
+
+    this.opponentHandGroup.clear();
     const opponentHandPositions = CardLayout.calculateHandPositions(opponentCards.length, 0.05);
     opponentCards.forEach((card, i) => {
         const cardMesh = this.cardManager.createCard(card, false);
         cardMesh.position.set(opponentHandPositions[i].x, opponentHandPositions[i].y + 5.5, opponentHandPositions[i].z);
         this.opponentHandGroup.add(cardMesh);
-        this.add(cardMesh);
     });
   }
 

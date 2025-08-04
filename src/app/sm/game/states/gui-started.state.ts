@@ -2,6 +2,7 @@ import { BaseState } from '../../base-state';
 import { StateEnum } from '../../state.enum';
 import { EventEnum, SimpleEvent } from '../../../events/event.enum';
 import { GameStateMachine } from '../game-state-machine';
+import { MaterialFactory } from '../../../gui/utils/material.factory';
 
 export class GuiStartedState extends BaseState {
   constructor(
@@ -12,7 +13,9 @@ export class GuiStartedState extends BaseState {
 
   onEntry(): void {
     console.log('Entering GuiStartedState');
-    // this.gameSceneController.showWinnerBanner('Game Over');
+     MaterialFactory.preloadAllMaterials().then(() => {
+      this.transition(StateEnum.DEAL_CARDS)
+    });
   }
 
   override onEvent(simpleEvent: SimpleEvent): boolean {
