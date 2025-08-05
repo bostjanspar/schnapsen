@@ -23,16 +23,23 @@ export class ThreeService {
   private activeScene!: BaseScene;
 
   private eventSubject = new Subject<SimpleEvent>();
+  
+  private isPageVisible: boolean = true;
+  private targetFrameRate: number = 60;
+  private lastFrameTime: number = 0;
 
   constructor(private readonly randomService: RandomService) { }
 
   public async init(container: HTMLElement) {
     // Renderer
-    this.renderer = new THREE.WebGLRenderer();
+    this.renderer = new THREE.WebGLRenderer({
+      antialias: false, // Disable antialiasing for better performance
+      powerPreference: "high-performance" // Optimize for performance
+    });
     const width = Math.max(window.innerWidth, 600);
     const height = Math.max(window.innerHeight, 600);
     this.renderer.setSize(width, height);
-    this.renderer.setPixelRatio(window.devicePixelRatio);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limit pixel ratio to reduce GPU load
     container.appendChild(this.renderer.domElement);
 
     // Camera
@@ -42,7 +49,9 @@ export class ThreeService {
    
 
     this.setActiveScene(SchnapsenScene.Startup);
-    this.animate();
+    
+    // Add visibility change listener for performance optimization
+    document.addEventListener('visibilitychange', this.onVisibilityChange);
     window.addEventListener('resize', this.onResize);
 
    
@@ -54,6 +63,9 @@ export class ThreeService {
     this.eventSubject.subscribe(event => {
       sm.onEvent(event);
     });
+    
+    // Start animation loop
+    this.animate();
    
   }
 
@@ -95,9 +107,11 @@ export class ThreeService {
   private animate = () => {
     requestAnimationFrame(this.animate);
 
-    this.activeScene.update();
-
-    this.renderer.render(this.activeScene, this.camera);
+    // Only render if it's time for a new frame
+    if (this.shouldRenderFrame()) {
+      this.activeScene.update();
+      this.renderer.render(this.activeScene, this.camera);
+    }
   }
 
   private onResize = () => {
@@ -106,6 +120,24 @@ export class ThreeService {
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
+  }
+
+  private onVisibilityChange = () => {
+    this.isPageVisible = !document.hidden;
+    // Reduce frame rate when tab is not visible
+    this.targetFrameRate = this.isPageVisible ? 60 : 15;
+  }
+
+  private shouldRenderFrame(): boolean {
+    const now = performance.now();
+    const deltaTime = now - this.lastFrameTime;
+    const minFrameTime = 1000 / this.targetFrameRate;
+    
+    if (deltaTime >= minFrameTime) {
+      this.lastFrameTime = now - (deltaTime % minFrameTime);
+      return true;
+    }
+    return false;
   }
 
   public handleInteraction(event: MouseEvent) {

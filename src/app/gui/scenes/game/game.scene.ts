@@ -19,6 +19,7 @@ export class GameScene extends BaseScene {
   public guiStateManager!: GUIStateManager;
   private hoveredCard: THREE.Object3D | null = null;
   private hoveredCardPlayable: boolean = false;
+  private needsUpdate: boolean = false;
 
   
   // Card groups for easy management
@@ -192,8 +193,21 @@ export class GameScene extends BaseScene {
   }
 
   public update(): void {
-    TWEEN.update();
-    GameAnimations.animateHandReorganization(this.playerHandGroup);
+    // Only update if there are active animations or tweens
+    if (TWEEN.getAll().length > 0) {
+      TWEEN.update();
+      this.needsUpdate = true;
+    }
+    
+    // Only animate hand reorganization if there are selected cards
+    const hasSelectedCards = this.playerHandGroup.children.some(child => child.userData['selected']);
+    if (hasSelectedCards) {
+      GameAnimations.animateHandReorganization(this.playerHandGroup);
+      this.needsUpdate = true;
+    }
+    
+    // Reset needsUpdate flag
+    this.needsUpdate = false;
   }
 
   public onMouseMove(mouse: THREE.Vector2): void {
