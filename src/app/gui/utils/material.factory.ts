@@ -1,20 +1,27 @@
 import * as THREE from 'three';
+import { GameConstants } from '../../logic/game.constants';
 import { Suit, Rank } from '../../logic/schnapsen.rules';
 import { TextureUtils } from './texture.utils';
 
 export class MaterialFactory {
   private static materialCache: Map<string, THREE.Material> = new Map();
 
-  static getCardMaterial(cardId: string, faceUp: boolean): THREE.Material {
+  static getCardMaterial(cardId: string, faceUp: boolean): THREE.Material[] {
+    const faceMaterial = this.materialCache.get(cardId)!;
+    const backMaterial = this.materialCache.get('back')!;
+    const sideMaterial = this.materialCache.get('side')!;
 
-    const cacheKey = faceUp ? `${cardId}` : `back`;
-    if (this.materialCache.has(cacheKey)) {
-      return this.materialCache.get(cacheKey)!;
-    }
-    // Implementation will go here
-    const material = new THREE.MeshBasicMaterial();
-    this.materialCache.set(cacheKey, material);
-    return material;
+    const front = faceUp ? faceMaterial : backMaterial;
+    const back = faceUp ? backMaterial : faceMaterial;
+
+    return [
+      sideMaterial, // right
+      sideMaterial, // left
+      sideMaterial, // top
+      sideMaterial, // bottom
+      front,        // front
+      back,         // back
+    ];
   }
 
   static getUIMaterial(type: string, style: any): THREE.Material {
@@ -37,11 +44,15 @@ export class MaterialFactory {
     const promises = [];
 
     // Preload card back
+    const cardBackTexture = TextureUtils.createCardBackTexture('default', []);
     const cardBackMaterial = new THREE.MeshLambertMaterial({
-            map: TextureUtils.createCardBackTexture('default', []),
+            map: cardBackTexture,
       transparent: true,
     });
     this.materialCache.set('back', cardBackMaterial);
+
+    const sideMaterial = new THREE.MeshBasicMaterial({ color: GameConstants.TABLE_COLOR });
+    this.materialCache.set('side', sideMaterial);
 
     // Preload card faces
     for (const suit of Object.values(Suit)) {

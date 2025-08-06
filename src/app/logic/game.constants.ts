@@ -1,4 +1,5 @@
 export const GameConstants = {
+  TABLE_COLOR: 0x1a4a3a,
   CARD_DIMENSIONS: { width: 1.6, height: 2.4, depth: 0.01, OPPONENT_CARD_SCALE: 0.8 },
   CARD_SPACING: 0.1,
   ANIMATION_DURATION: 500,

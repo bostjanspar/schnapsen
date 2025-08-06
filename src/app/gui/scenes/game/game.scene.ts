@@ -77,7 +77,7 @@ export class GameScene extends BaseScene {
     // Table surface
     const tableGeometry = new THREE.CircleGeometry(12, 64);
     // Use MeshBasicMaterial directly to ensure color is correct
-    const tableMaterial = new THREE.MeshBasicMaterial({ color: 0x1a4a3a }); // Dark green
+    const tableMaterial = new THREE.MeshBasicMaterial({ color: GameConstants.TABLE_COLOR }); // Dark green
     const table = new THREE.Mesh(tableGeometry, tableMaterial);
     table.position.y = -0.1;
     table.position.z = -5;

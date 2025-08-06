@@ -19,8 +19,8 @@ export class CardManager {
   }
 
   public createCard(cardData: Card, faceUp: boolean): THREE.Mesh {
-    const material = MaterialFactory.getCardMaterial(cardData.id, faceUp);
-    const cardMesh = new THREE.Mesh(this.cardGeometry, material);
+    const materials = MaterialFactory.getCardMaterial(cardData.id, faceUp);
+    const cardMesh = new THREE.Mesh(this.cardGeometry, materials);
     cardMesh.userData = { card: cardData, faceUp };
     cardMesh.castShadow = true;
     cardMesh.receiveShadow = true;
