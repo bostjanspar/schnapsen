@@ -21,13 +21,12 @@ export class GuiController{
     selectDealerScene.initialize(dealerCard, newDealer ? true : false);
   }
 
-  dealTheCards(playerCards: Card[], opponentCards: Card[]) {
-   
+  dealTheCards() {
     const scene =  this.threeService.setActiveScene(SchnapsenScene.Game);
     if (!(scene instanceof GameScene)) {
        throw new Error('Active scene is not GameScene');
     }
-
-    scene.displayHands(playerCards, opponentCards);
+    // Refresh the display with current GameLogic state
+    scene.refreshDisplay();
   }  
 }

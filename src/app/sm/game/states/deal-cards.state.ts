@@ -16,8 +16,7 @@ export class DealCardsState extends BaseState {
      gameLogic.prepareNewHand();
 
     
-       this.machine.guiController.dealTheCards(gameLogic.playerHand$.getValue(),
-          gameLogic.opponentHand$.getValue());
+       this.machine.guiController.dealTheCards();
   }
 
   onLeave(): void {

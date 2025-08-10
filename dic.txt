@@ -18,4 +18,12 @@ Player two dealer make an arrow up animation.
 
 
 
-Use Context7 mcp to verify Three.js documentation  if  Three.js is used correctly and its best practice  . Documentation. Yeah, MCP server for three JS. 
+Use Context7 mcp to verify Three.js documentation  if  Three.js is used correctly and its best practice . Also update  @CLAUDE.md to use Context7 mcp for external documentation
+
+
+@src/app/gui/scenes/game
+@src/app/logic/game-logic.ts
+I would need to plan how can game scene access game logic member variables like deck,playerHand,opponentHand. so i do not have to pass it over @src/app/gui/scenes/gui-controller.ts  , .
+ But I definitely want to have it only read only  access game logic variables . Game scene should never be allowed to change anything on game logic side.
+How could be the best way to achieve this? 
+But it never reacts by itself when some of the game logic member variable changes. I will call it over the control class gui-controller.ts. 

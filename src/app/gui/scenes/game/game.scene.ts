@@ -10,6 +10,7 @@ import { ThreeService } from '../../services/three.service';
 import TWEEN from '@tweenjs/tween.js';
 import { Card } from '../../../logic/schnapsen.rules';
 import { CardLayout } from './cards/card-layout';
+import { GameLogic } from '../../../logic/game-logic';
 
 
 
@@ -20,6 +21,7 @@ export class GameScene extends BaseScene {
   private hoveredCard: THREE.Object3D | null = null;
   private hoveredCardPlayable: boolean = false;
   private needsUpdate: boolean = false;
+  private gameLogic: GameLogic;
 
   
   // Card groups for easy management
@@ -32,8 +34,9 @@ export class GameScene extends BaseScene {
 
  
 
-  constructor(protected override readonly camera: THREE.Camera) {     
+  constructor(protected override readonly camera: THREE.Camera, gameLogic: GameLogic) {     
     super(camera);
+    this.gameLogic = gameLogic;
     //this.background = new THREE.Color(0x1a4a3a); // Dark green table color
     this.background = new THREE.Color(0x111111);
   }
@@ -46,6 +49,7 @@ export class GameScene extends BaseScene {
     await MaterialFactory.preloadAllMaterials();
     this.setupTable();
     this.createCardGroups();
+    
     console.log('GameScene initialized');
     
   }
@@ -240,6 +244,33 @@ export class GameScene extends BaseScene {
         }
       }
     });
+  }
+
+  /**
+   * Refresh the display based on current GameLogic state
+   * This method should be called manually from the GUI controller when game state changes
+   */
+  public refreshDisplay(): void {
+    // Update hands display
+    this.displayHands(this.gameLogic.playerHand, this.gameLogic.opponentHand);
+    
+    // Update talon display
+    this.updateTalonDisplay(this.gameLogic.talon);
+    
+    // Update trump card display
+    if (this.gameLogic.trumpCard) {
+      this.updateTrumpCardDisplay(this.gameLogic.trumpCard);
+    }
+  }
+
+  private updateTalonDisplay(talonCards: Card[]): void {
+    // Implementation for updating talon display
+    // This can be implemented later as needed
+  }
+
+  private updateTrumpCardDisplay(trumpCard: Card): void {
+    // Implementation for updating trump card display
+    // This can be implemented later as needed
   }
 
   public saveCurrentState(): GUIState {

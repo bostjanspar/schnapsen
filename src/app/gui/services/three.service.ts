@@ -21,6 +21,7 @@ export class ThreeService {
   private renderer!: THREE.WebGLRenderer;
 
   private activeScene!: BaseScene;
+  private gameLogic!: GameLogic;
 
   private eventSubject = new Subject<SimpleEvent>();
   
@@ -28,7 +29,9 @@ export class ThreeService {
   private targetFrameRate: number = 60;
   private lastFrameTime: number = 0;
 
-  constructor(private readonly randomService: RandomService) { }
+  constructor(private readonly randomService: RandomService) { 
+    this.gameLogic = new GameLogic(this.randomService);
+  }
 
   public async init(container: HTMLElement) {
     // Renderer
@@ -56,7 +59,7 @@ export class ThreeService {
 
    
     const sm = new GameStateMachine(
-      new GameLogic(this.randomService),
+      this.gameLogic,
       new GuiController(this)      
     );
 
@@ -85,7 +88,7 @@ export class ThreeService {
         return new SelectDealerScene(this.eventSubject, this.camera);
       case SchnapsenScene.Game:{
          // Scenes
-        const gameScene = new GameScene(this.camera);
+        const gameScene = new GameScene(this.camera, this.gameLogic);
         gameScene.initialize(this);
         return gameScene;
       }

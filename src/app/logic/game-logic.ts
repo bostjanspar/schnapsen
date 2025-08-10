@@ -16,6 +16,43 @@ export class GameLogic {
   public trumpCard$ = new BehaviorSubject<Card | null>(null);
   public isTalonClosed$ = new BehaviorSubject<boolean>(false);
 
+  // Getter methods for read-only access
+  public get dealer(): number {
+    return this.dealer$.getValue();
+  }
+
+  public get playerPoints(): number {
+    return this.playerPoints$.getValue();
+  }
+
+  public get opponentPoints(): number {
+    return this.opponentPoints$.getValue();
+  }
+
+  public get deck(): Card[] {
+    return this.deck$.getValue();
+  }
+
+  public get playerHand(): Card[] {
+    return this.playerHand$.getValue();
+  }
+
+  public get opponentHand(): Card[] {
+    return this.opponentHand$.getValue();
+  }
+
+  public get talon(): Card[] {
+    return this.talon$.getValue();
+  }
+
+  public get trumpCard(): Card | null {
+    return this.trumpCard$.getValue();
+  }
+
+  public get isTalonClosed(): boolean {
+    return this.isTalonClosed$.getValue();
+  }
+
   constructor(private readonly randomService: RandomService) { 
 
   }
