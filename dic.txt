@@ -16,3 +16,6 @@ if it's a red then the player 1 dealer if a black suit then the player 2 is the 
 Player two dealer make an arrow up animation.
 
 
+
+
+Use Context7 mcp to verify Three.js documentation  if  Three.js is used correctly and its best practice  . Documentation. Yeah, MCP server for three JS. 
