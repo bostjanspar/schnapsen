@@ -5,7 +5,6 @@ import { CardManager } from './cards/card-manager';
 import { GameInteractions } from './interactions/game-interactions';
 import { GameAnimations } from './interactions/game-animations';
 import { MaterialFactory } from '../../utils/material.factory';
-import { GUIStateManager, GUIState } from './state/gui-state-manager';
 import { ThreeService } from '../../services/three.service';
 import TWEEN from '@tweenjs/tween.js';
 import { Card } from '../../../logic/schnapsen.rules';
@@ -17,7 +16,6 @@ import { GameLogic } from '../../../logic/game-logic';
 export class GameScene extends BaseScene {
   public cardManager!: CardManager;
   private gameInteractions!: GameInteractions;
-  public guiStateManager!: GUIStateManager;
   private hoveredCard: THREE.Object3D | null = null;
   private hoveredCardPlayable: boolean = false;
   private needsUpdate: boolean = false;
@@ -43,7 +41,6 @@ export class GameScene extends BaseScene {
 
   public async initialize(threeService: ThreeService) {
     this.cardManager = new CardManager(this);
-    this.guiStateManager = new GUIStateManager(this);
     this.gameInteractions = new GameInteractions(this);
 
     await MaterialFactory.preloadAllMaterials();
@@ -250,7 +247,7 @@ export class GameScene extends BaseScene {
    * Refresh the display based on current GameLogic state
    * This method should be called manually from the GUI controller when game state changes
    */
-  public refreshDisplay(): void {
+  public dealNewCards(): void {
     // Update hands display
     this.displayHands(this.gameLogic.playerHand, this.gameLogic.opponentHand);
     
@@ -273,11 +270,4 @@ export class GameScene extends BaseScene {
     // This can be implemented later as needed
   }
 
-  public saveCurrentState(): GUIState {
-    return this.guiStateManager.captureState();
-  }
-
-  public loadState(state: GUIState): void {
-    this.guiStateManager.restoreState(state);
-  }
 }

@@ -11,8 +11,7 @@ export class FinalGameState extends BaseState {
   }
 
   onEntry(): void {
-    console.log('Entering FinalGameState');
-    // this.gameSceneController.showWinnerBanner('Game Over');
+    console.log('Entering FinalGameState');   
   }
 
 

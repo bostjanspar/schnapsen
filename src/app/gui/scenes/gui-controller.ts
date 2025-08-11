@@ -27,6 +27,6 @@ export class GuiController{
        throw new Error('Active scene is not GameScene');
     }
     // Refresh the display with current GameLogic state
-    scene.refreshDisplay();
-  }  
+    scene.dealNewCards();
+  }
 }
