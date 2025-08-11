@@ -27,3 +27,6 @@ I would need to plan how can game scene access game logic member variables like 
  But I definitely want to have it only read only  access game logic variables . Game scene should never be allowed to change anything on game logic side.
 How could be the best way to achieve this? 
 But it never reacts by itself when some of the game logic member variable changes. I will call it over the control class gui-controller.ts. 
+
+
+Go through the code  of @src/app/gui/scenes/game and in @file src/app/gui/scenes/game/game.scene.ts implement to show talun and trumpCard under it.  display it as part of dealNewCards game.scene.ts

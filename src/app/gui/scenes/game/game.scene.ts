@@ -20,6 +20,7 @@ export class GameScene extends BaseScene {
   private hoveredCardPlayable: boolean = false;
   private needsUpdate: boolean = false;
   private gameLogic: GameLogic;
+  private trumpCardMesh: THREE.Mesh | null = null;
 
   
   // Card groups for easy management
@@ -261,13 +262,50 @@ export class GameScene extends BaseScene {
   }
 
   private updateTalonDisplay(talonCards: Card[]): void {
-    // Implementation for updating talon display
-    // This can be implemented later as needed
+    // Clear existing talon display
+    this.talonGroup.clear();
+    
+    // Create a simple visual representation of the talon (just showing the count)
+    const talonPosition = GameConstants.TALON_LAYOUT.position;
+    
+    // Create a placeholder card to represent the talon stack
+    if (talonCards.length > 0) {
+      
+      const cardMesh = this.cardManager.createCard(talonCards[0], false);;
+      cardMesh.position.set(talonPosition.x, talonPosition.y, talonPosition.z);
+      cardMesh.name = 'talonStack';
+      
+      this.talonGroup.add(cardMesh);
+      
+      
+    }
   }
 
   private updateTrumpCardDisplay(trumpCard: Card): void {
-    // Implementation for updating trump card display
-    // This can be implemented later as needed
+    // Remove existing trump card if it exists
+    if (this.trumpCardMesh) {
+      this.remove(this.trumpCardMesh);
+      this.trumpCardMesh = null;
+    }
+    
+    // Create a new trump card mesh and position it below the talon
+    const trumpCardMesh = this.cardManager.createCard(trumpCard, true); // Trump card is face up
+    const talonPosition = GameConstants.TALON_LAYOUT.position;
+
+    trumpCardMesh.rotateZ(Math.PI/2); // Rotate trump card 90 degrees
+    // Position trump card below the talon
+    trumpCardMesh.position.set(
+      talonPosition.x+1,
+      talonPosition.y,  // Position below the talon
+      talonPosition.z-0.1
+     );
+    trumpCardMesh.name = 'trumpCard';
+    
+    // Store reference to the trump card mesh
+    this.trumpCardMesh = trumpCardMesh;
+    
+    // Add to scene
+    this.add(trumpCardMesh);
   }
 
 }
