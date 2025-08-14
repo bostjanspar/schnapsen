@@ -395,7 +395,6 @@ export class GameScene extends BaseScene {
   private sortPlayerHand(): void {
     // Get current positions of cards in player's hand
     const currentCards = [...this.playerHandGroup.children];
-    const currentPositions = currentCards.map(card => card.position.clone());
     
     // Sort the hand in the game logic
     const sortedHand = this.gameLogic.sortPlayerHand();
@@ -413,18 +412,46 @@ export class GameScene extends BaseScene {
       );
     });
     
-    // Animate each card to its new position
-    const animationDuration = 500; // ms
-    currentCards.forEach((cardMesh, index) => {
+    // Find cards that need to change position
+    const cardsToMove: { cardMesh: THREE.Object3D; targetPosition: THREE.Vector3 }[] = [];
+    currentCards.forEach((cardMesh) => {
       const cardId = cardMesh.userData['card']?.id;
       if (cardId && cardIdToNewPosition[cardId]) {
         const targetPosition = cardIdToNewPosition[cardId];
+        const currentPosition = cardMesh.position;
         
-        new TWEEN.Tween(cardMesh.position)
-          .to(targetPosition, animationDuration)
-          .easing(TWEEN.Easing.Quadratic.Out)
-          .start();
+        // Check if card needs to move
+        if (Math.abs(currentPosition.x - targetPosition.x) > 0.01 || 
+            Math.abs(currentPosition.z - targetPosition.z) > 0.01) {
+          cardsToMove.push({ cardMesh, targetPosition });
+        }
       }
+    });
+    
+    // Animate cards one by one
+    const animationDuration = 300; // ms per card
+    const delayBetweenAnimations = 100; // ms
+    
+    cardsToMove.forEach(({ cardMesh, targetPosition }, index) => {
+      // Adjust target position slightly upward
+      const adjustedPosition = targetPosition.clone();
+      adjustedPosition.y += 0.3;
+      
+      // Delay each animation
+      setTimeout(() => {
+        // First tween: move to adjusted position (slightly up)
+        new TWEEN.Tween(cardMesh.position)
+          .to(adjustedPosition, animationDuration / 2)
+          .easing(TWEEN.Easing.Quadratic.Out)
+          .onComplete(() => {
+            // Second tween: move down to final position
+            new TWEEN.Tween(cardMesh.position)
+              .to(targetPosition, animationDuration / 2)
+              .easing(TWEEN.Easing.Quadratic.In)
+              .start();
+          })
+          .start();
+      }, index * (animationDuration + delayBetweenAnimations));
     });
   }
 
