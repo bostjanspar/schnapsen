@@ -244,21 +244,160 @@ export class GameScene extends BaseScene {
     });
   }
 
+
+  public animateDeal(): void {
+    const dealOrder = [
+      // First 3 cards
+      { isPlayer: false, hand: this.gameLogic.opponentHand, cardIndex: 0 },
+      { isPlayer: true, hand: this.gameLogic.playerHand, cardIndex: 0 },
+      { isPlayer: false, hand: this.gameLogic.opponentHand, cardIndex: 1 },
+      { isPlayer: true, hand: this.gameLogic.playerHand, cardIndex: 1 },
+      { isPlayer: false, hand: this.gameLogic.opponentHand, cardIndex: 2 },
+      { isPlayer: true, hand: this.gameLogic.playerHand, cardIndex: 2 },
+    ];
+
+    const deckPosition = new THREE.Vector3(GameConstants.DECK_LAYOUT.position.x, GameConstants.DECK_LAYOUT.position.y, GameConstants.DECK_LAYOUT.position.z);
+    let animationDelay = 0;
+    const animationStepDelay = 200;
+
+    // Animate first 3 cards
+    dealOrder.forEach((deal) => {
+      const card = deal.hand[deal.cardIndex];
+      // Create cards with correct face orientation:
+      // - Opponent cards: always face down (false) - back texture shown
+      // - Player cards: always face up (true) - face texture shown
+      const cardMesh = this.cardManager.createCard(card, deal.isPlayer);
+      cardMesh.position.copy(deckPosition);
+      this.add(cardMesh);
+
+      // Calculate correct positions based on the displayHands method
+      const playerHandPositions = CardLayout.calculateHandPositions(this.gameLogic.playerHand.length);
+      const opponentHandPositions = CardLayout.calculateHandPositions(this.gameLogic.opponentHand.length, 0.05); // Use 0.05 spacing for opponent
+      
+      let targetPosition;
+      if (deal.isPlayer) {
+        // Player cards at bottom
+        targetPosition = new THREE.Vector3(
+          playerHandPositions[deal.cardIndex].x, 
+          playerHandPositions[deal.cardIndex].y, 
+          playerHandPositions[deal.cardIndex].z
+        );
+      } else {
+        // Opponent cards at top (y + 5.5)
+        targetPosition = new THREE.Vector3(
+          opponentHandPositions[deal.cardIndex].x, 
+          opponentHandPositions[deal.cardIndex].y + 5.5, 
+          opponentHandPositions[deal.cardIndex].z
+        );
+      }
+
+      GameAnimations.animateCardDeal(cardMesh, deal.isPlayer, targetPosition, animationDelay, () => {
+        const targetGroup = deal.isPlayer ? this.playerHandGroup : this.opponentHandGroup;
+        targetGroup.add(cardMesh);
+      });
+      animationDelay += animationStepDelay;
+    });
+
+    // Animate trump card
+    const trumpCard = this.gameLogic.trumpCard;
+    if (trumpCard) {
+      // Trump card should be face up (player can see it)
+      const trumpMesh = this.cardManager.createCard(trumpCard, true);
+      trumpMesh.position.copy(deckPosition);
+      this.add(trumpMesh);
+      
+      const trumpPosition = new THREE.Vector3(
+        GameConstants.TALON_LAYOUT.position.x + 1, 
+        GameConstants.TALON_LAYOUT.position.y, 
+        GameConstants.TALON_LAYOUT.position.z - 0.1
+      );
+
+      GameAnimations.animateCardDeal(trumpMesh, true, trumpPosition, animationDelay, () => {
+        this.trumpCardMesh = trumpMesh;
+        this.talonGroup.add(trumpMesh);
+        trumpMesh.rotateZ(Math.PI/2);
+      });
+      animationDelay += animationStepDelay;
+    }
+
+    const dealOrder2 = [
+      // Next 2 cards
+      { isPlayer: false, hand: this.gameLogic.opponentHand, cardIndex: 3 },
+      { isPlayer: true, hand: this.gameLogic.playerHand, cardIndex: 3 },
+      { isPlayer: false, hand: this.gameLogic.opponentHand, cardIndex: 4 },
+      { isPlayer: true, hand: this.gameLogic.playerHand, cardIndex: 4 },
+    ];
+
+    dealOrder2.forEach((deal) => {
+      const card = deal.hand[deal.cardIndex];
+      // Create cards with correct face orientation:
+      // - Opponent cards: always face down (false) - back texture shown
+      // - Player cards: always face up (true) - face texture shown
+      const cardMesh = this.cardManager.createCard(card, deal.isPlayer);
+      cardMesh.position.copy(deckPosition);
+      this.add(cardMesh);
+
+      // Calculate correct positions based on the displayHands method
+      const playerHandPositions = CardLayout.calculateHandPositions(this.gameLogic.playerHand.length);
+      const opponentHandPositions = CardLayout.calculateHandPositions(this.gameLogic.opponentHand.length, 0.05); // Use 0.05 spacing for opponent
+      
+      let targetPosition;
+      if (deal.isPlayer) {
+        // Player cards at bottom
+        targetPosition = new THREE.Vector3(
+          playerHandPositions[deal.cardIndex].x, 
+          playerHandPositions[deal.cardIndex].y, 
+          playerHandPositions[deal.cardIndex].z
+        );
+      } else {
+        // Opponent cards at top (y + 5.5)
+        targetPosition = new THREE.Vector3(
+          opponentHandPositions[deal.cardIndex].x, 
+          opponentHandPositions[deal.cardIndex].y + 5.5, 
+          opponentHandPositions[deal.cardIndex].z
+        );
+      }
+
+      GameAnimations.animateCardDeal(cardMesh, deal.isPlayer, targetPosition, animationDelay, () => {
+        const targetGroup = deal.isPlayer ? this.playerHandGroup : this.opponentHandGroup;
+        targetGroup.add(cardMesh);
+      });
+      animationDelay += animationStepDelay;
+    });
+
+    // Animate talon
+    if (this.gameLogic.talon.length > 0) {
+      // Talon card should be face down (player cannot see it)
+      const talonStack = this.cardManager.createCard(this.gameLogic.talon[0], false);
+      talonStack.position.copy(deckPosition);
+      this.add(talonStack);
+      
+      const talonPosition = new THREE.Vector3(
+        GameConstants.TALON_LAYOUT.position.x, 
+        GameConstants.TALON_LAYOUT.position.y, 
+        GameConstants.TALON_LAYOUT.position.z
+      );
+
+      GameAnimations.animateCardDeal(talonStack, false, talonPosition, animationDelay, () => {
+        this.talonGroup.add(talonStack);
+
+        this.displayHands(this.gameLogic.playerHand, this.gameLogic.opponentHand);
+        this.updateTalonDisplay(this.gameLogic.talon);
+        if (this.gameLogic.trumpCard) {
+          this.updateTrumpCardDisplay(this.gameLogic.trumpCard);
+        }
+        console.log("animation done");
+        
+      });
+    }
+  }
+
   /**
    * Refresh the display based on current GameLogic state
    * This method should be called manually from the GUI controller when game state changes
    */
   public dealNewCards(): void {
-    // Update hands display
-    this.displayHands(this.gameLogic.playerHand, this.gameLogic.opponentHand);
-    
-    // Update talon display
-    this.updateTalonDisplay(this.gameLogic.talon);
-    
-    // Update trump card display
-    if (this.gameLogic.trumpCard) {
-      this.updateTrumpCardDisplay(this.gameLogic.trumpCard);
-    }
+    this.animateDeal();
   }
 
   private updateTalonDisplay(talonCards: Card[]): void {
@@ -295,9 +434,9 @@ export class GameScene extends BaseScene {
     trumpCardMesh.rotateZ(Math.PI/2); // Rotate trump card 90 degrees
     // Position trump card below the talon
     trumpCardMesh.position.set(
-      talonPosition.x+1,
+      talonPosition.x + 1,
       talonPosition.y,  // Position below the talon
-      talonPosition.z-0.1
+      talonPosition.z - 0.1
      );
     trumpCardMesh.name = 'trumpCard';
     

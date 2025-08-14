@@ -14,6 +14,9 @@ export const GameConstants = {
     player1: { x: 0, y: -2.5, z: 0 },
     player2: { x: 0, y: 2.5, z: 0 },
   },
+  DECK_LAYOUT: {
+    position: { x: 2.5, y: 0.5, z: 0 },
+  },
   TALON_LAYOUT: {
     position: { x: -2.5, y: 0.5, z: 0 },
   },
