@@ -104,4 +104,44 @@ export class GameLogic {
     this.trumpCard$.next(trumpCard);
     this.deck$.next(deck);
   }
+
+  /**
+   * Sorts the player's hand first by suit, then by rank and updates the playerHand$ BehaviorSubject
+   * @returns A new sorted array of cards
+   */
+  public sortPlayerHand(): Card[] {
+    // If no hand is provided, use the current player hand
+    const cardsToSort = [...this.playerHand];
+    
+    // Define suit order (you can adjust this as needed)
+    const suitOrder: Record<Suit, number> = {
+      [Suit.HEARTS]: 0,
+      [Suit.DIAMONDS]: 1,
+      [Suit.CLUBS]: 2,
+      [Suit.SPADES]: 3
+    };
+    
+    // Define rank order (from lowest to highest according to Schnapsen rules)
+    const rankOrder: Record<Rank, number> = {
+      [Rank.JACK]: 1,
+      [Rank.QUEEN]: 2,
+      [Rank.KING]: 3,
+      [Rank.TEN]: 4,
+      [Rank.ACE]: 5
+    };
+    
+    // Sort the cards
+    const sortedCards = cardsToSort.sort((a, b) => {
+      // First sort by suit
+      if (suitOrder[a.suit] !== suitOrder[b.suit]) {
+        return suitOrder[a.suit] - suitOrder[b.suit];
+      }
+      // Then sort by rank
+      return rankOrder[a.rank] - rankOrder[b.rank];
+    });
+    
+    this.playerHand$.next(sortedCards);
+    return sortedCards;
+  }
+
 }

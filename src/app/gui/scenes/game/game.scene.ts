@@ -95,7 +95,6 @@ export class GameScene extends BaseScene {
       const cardMesh = this.cardManager.createCard(card, true);
       cardMesh.position.set(playerHandPositions[i].x, playerHandPositions[i].y, playerHandPositions[i].z);
       this.playerHandGroup.add(cardMesh);
-
     });
 
 
@@ -386,10 +385,47 @@ export class GameScene extends BaseScene {
         if (this.gameLogic.trumpCard) {
           this.updateTrumpCardDisplay(this.gameLogic.trumpCard);
         }
+        this.sortPlayerHand();
         console.log("animation done");
         
       });
     }
+  }
+
+  private sortPlayerHand(): void {
+    // Get current positions of cards in player's hand
+    const currentCards = [...this.playerHandGroup.children];
+    const currentPositions = currentCards.map(card => card.position.clone());
+    
+    // Sort the hand in the game logic
+    const sortedHand = this.gameLogic.sortPlayerHand();
+    
+    // Calculate new positions for sorted cards
+    const newPositions = CardLayout.calculateHandPositions(sortedHand.length);
+    
+    // Create a mapping of card IDs to their new positions
+    const cardIdToNewPosition: Record<string, THREE.Vector3> = {};
+    sortedHand.forEach((card, index) => {
+      cardIdToNewPosition[card.id] = new THREE.Vector3(
+        newPositions[index].x,
+        newPositions[index].y,
+        newPositions[index].z
+      );
+    });
+    
+    // Animate each card to its new position
+    const animationDuration = 500; // ms
+    currentCards.forEach((cardMesh, index) => {
+      const cardId = cardMesh.userData['card']?.id;
+      if (cardId && cardIdToNewPosition[cardId]) {
+        const targetPosition = cardIdToNewPosition[cardId];
+        
+        new TWEEN.Tween(cardMesh.position)
+          .to(targetPosition, animationDuration)
+          .easing(TWEEN.Easing.Quadratic.Out)
+          .start();
+      }
+    });
   }
 
   /**
