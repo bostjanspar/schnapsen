@@ -12,6 +12,9 @@ import { GuiController } from '../scenes/gui-controller';
 import { Subject } from 'rxjs';
 import { SimpleEvent } from '../../events/event.enum';
 
+import { TextService } from './text.service';
+import { TranslateService } from '@ngx-translate/core';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -29,7 +32,11 @@ export class ThreeService {
   private targetFrameRate: number = 60;
   private lastFrameTime: number = 0;
 
-  constructor(private readonly randomService: RandomService) { 
+  constructor(
+    private readonly randomService: RandomService,
+    private readonly textService: TextService,
+    private readonly translate: TranslateService
+  ) { 
     this.gameLogic = new GameLogic(this.randomService);
   }
 
@@ -83,7 +90,7 @@ export class ThreeService {
   private buildScenes(sceneEnum: SchnapsenScene) : BaseScene {
     switch (sceneEnum) {
       case SchnapsenScene.Startup:
-        return new StartupScene(this.eventSubject, this.camera);
+        return new StartupScene(this.eventSubject, this.camera, this.textService, this.translate);
       case SchnapsenScene.SelectDealer:
         return new SelectDealerScene(this.eventSubject, this.camera);
       case SchnapsenScene.Game:{
