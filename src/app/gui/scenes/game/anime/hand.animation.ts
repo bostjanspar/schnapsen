@@ -1,10 +1,16 @@
 import * as THREE from 'three';
 import TWEEN from '@tweenjs/tween.js';
 import { GameConstants } from '../../../../logic/game.constants';
+import { BaseAnimation } from './base.animation';
+import { GameScene } from '../game.scene';
 
-export class HandAnimation {
+export class HandAnimation extends BaseAnimation {
   private lastUpdateTime: number = 0;
   private animationPhase: number = 0;
+
+  constructor(scene: GameScene) {
+    super(scene);
+  }
 
   animateHandReorganization(hand: THREE.Group): void {
     const now = performance.now();

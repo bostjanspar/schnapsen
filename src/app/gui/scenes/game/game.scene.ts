@@ -15,6 +15,7 @@ import { CardDealAnimation } from './anime/card-deal.animation';
 import { CardPlayAnimation } from './anime/card-play.animation';
 import { CardHoverAnimation } from './anime/card-hover.animation';
 import { HandAnimation } from './anime/hand.animation';
+import { TrickAnimation } from './anime/trick.animation';
 
 
 
@@ -113,25 +114,24 @@ export class GameScene extends BaseScene {
   }
 
 
-  public playCardToTrick(cardName: string, isPlayer: boolean): void {
-    const cardMesh = this.cardManager.cardMeshes.get(cardName);
+  public playCardToTrick(cardId: string, isPlayer: boolean): void {
+    const cardMesh = this.cardManager.cardMeshes.get(cardId);
     if (!cardMesh) return;
 
     // Move card to current trick area
     const fromPos = cardMesh.position.clone();
-    const trickPosition = isPlayer ?
-      new THREE.Vector3(0, 0, -1) :
-      new THREE.Vector3(0, 0, 1);
-    const cardPlayAnimation = new CardPlayAnimation();
-    cardPlayAnimation.animateCardPlay(cardMesh, fromPos, trickPosition);
-
-    // Remove from hand group and add to trick group
-    if (isPlayer) {
-      this.playerHandGroup.remove(cardMesh);
-    } else {
-      this.opponentHandGroup.remove(cardMesh);
-    }
-    this.currentTrickGroup.add(cardMesh);
+    const trickAnimation = new TrickAnimation(this);
+    // For now, we'll assume player played first (this would need to be determined from game state)
+    const isPlayerFirst = isPlayer; 
+    trickAnimation.animateCardToTrick(cardMesh, fromPos, isPlayer, isPlayerFirst, () => {
+      // Remove from hand group and add to trick group after animation
+      if (isPlayer) {
+        this.playerHandGroup.remove(cardMesh);
+      } else {
+        this.opponentHandGroup.remove(cardMesh);
+      }
+      this.currentTrickGroup.add(cardMesh);
+    });
   }
 
   public collectTrick(winner: 'player' | 'opponent'): void {
@@ -194,6 +194,8 @@ export class GameScene extends BaseScene {
       }
       const cardId = card.userData['card']?.id;
       if (cardId) {
+        
+        this.playCardToTrick(cardId, true);  
         //this.stateMachineManager.onEvent(GameEvent.PLAYER_CLICKED_CARD, { cardId });
       }
     });
@@ -209,7 +211,7 @@ export class GameScene extends BaseScene {
     // Only animate hand reorganization if there are selected cards
     const hasSelectedCards = this.playerHandGroup.children.some(child => child.userData['selected']);
     if (hasSelectedCards) {
-      const handAnimation = new HandAnimation();
+      const handAnimation = new HandAnimation(this);
       handAnimation.animateHandReorganization(this.playerHandGroup);
       this.needsUpdate = true;
     }
@@ -229,7 +231,7 @@ export class GameScene extends BaseScene {
       
       // Case 1: Mouse is not over a new card, but a card was hovered before. Unhover it.
       if (this.hoveredCard && this.hoveredCard !== card) {
-        const cardHoverAnimation = new CardHoverAnimation();
+        const cardHoverAnimation = new CardHoverAnimation(this);
         if (this.hoveredCardPlayable) {
           cardHoverAnimation.animatePlayableCardHover(this.hoveredCard as THREE.Mesh, false);
         } else {
@@ -240,7 +242,7 @@ export class GameScene extends BaseScene {
 
       // Case 2: Mouse is over a new player card. Hover it.
       if (card && card !== this.hoveredCard) {
-        const cardHoverAnimation = new CardHoverAnimation();
+        const cardHoverAnimation = new CardHoverAnimation(this);
         this.hoveredCard = card;
         this.hoveredCardPlayable = isPlayable;
         if (isPlayable) {
@@ -254,7 +256,7 @@ export class GameScene extends BaseScene {
 
 
   public animateDeal(): void {
-    const cardDealAnimation = new CardDealAnimation();
+    const cardDealAnimation = new CardDealAnimation(this);
     const dealOrder = cardDealAnimation.createDealOrder(
       this.gameLogic.playerHand, 
       this.gameLogic.opponentHand

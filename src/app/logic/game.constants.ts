@@ -18,10 +18,10 @@ export const GameConstants = {
     position: { x: 2.5, y: 0.5, z: 0 },
   },
   TALON_LAYOUT: {
-    position: { x: -2.5, y: 0.5, z: 0 },
+    position: { x: -3.3, y: 0.5, z: 0 },
   },
   TRICK_AREA_LAYOUT: {
-    position: { x: 1, y: 0, z: 0 },
+    position: { x: 1.5, y: .5, z: 0 },
   },
   COLLECTED_TRICKS_LAYOUT: {
     player1: { x: -3, y: -2.5, z: 0 },

@@ -1,7 +1,13 @@
 import * as THREE from 'three';
 import TWEEN from '@tweenjs/tween.js';
+import { BaseAnimation } from './base.animation';
+import { GameScene } from '../game.scene';
 
-export class CardHoverAnimation {
+export class CardHoverAnimation extends BaseAnimation {
+  constructor(scene: GameScene) {
+    super(scene);
+  }
+
   animatePlayableCardHover(card: THREE.Mesh, isHovering: boolean): void {
     const initialY = card.userData['initialY'] || card.position.y;
     if (isHovering) {

@@ -3,8 +3,14 @@ import TWEEN from '@tweenjs/tween.js';
 import { Card } from '../../../../logic/schnapsen.rules';
 import { GameConstants } from '../../../../logic/game.constants';
 import { CardLayout } from '../cards/card-layout';
+import { BaseAnimation } from './base.animation';
+import { GameScene } from '../game.scene';
 
-export class CardDealAnimation {
+export class CardDealAnimation extends BaseAnimation {
+  constructor(scene: GameScene) {
+    super(scene);
+  }
+
   animateCardDeal(card: THREE.Mesh, isPlayer: boolean, toPos: THREE.Vector3, delay: number, onComplete: () => void = () => {}): void {
     const fromPos = card.position.clone();
 
