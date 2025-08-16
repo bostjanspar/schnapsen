@@ -5,6 +5,7 @@ import { GameConstants } from '../../../../logic/game.constants';
 import { CardLayout } from '../cards/card-layout';
 import { BaseAnimation } from './base.animation';
 import { GameScene } from '../game.scene';
+import { HandSortAnimation } from './hand-sort.animation';
 
 export class CardDealAnimation extends BaseAnimation {
   constructor(scene: GameScene) {
@@ -132,7 +133,9 @@ export class CardDealAnimation extends BaseAnimation {
     const checkCompletion = () => {
       completedAnimations++;
       if (completedAnimations === totalAnimations) {
-        onComplete();
+        // After all deal animations are complete, sort the player's hand
+        const handSortAnimation = new HandSortAnimation(this.scene);
+        handSortAnimation.sortPlayerHand(onComplete);
       }
     };
 
@@ -193,15 +196,19 @@ export class CardDealAnimation extends BaseAnimation {
       this.animateCardDeal(talonStack, false, talonPosition, animationDelay, () => {
         this.scene.talonGroup.add(talonStack);
         this.scene.displayHands(playerHand, opponentHand);
-        // Call public methods instead of private ones
         this.scene['updateTalonDisplay'](talon);
         if (trumpCard) {
           this.scene['updateTrumpCardDisplay'](trumpCard);
         }
-        this.scene['sortPlayerHand']();
-        console.log("animation done");
+        // The hand sorting will be called after all deal animations are complete
         checkCompletion();
       });
+    }
+    
+    // Handle case where there are no deal animations
+    if (totalAnimations === 0) {
+      const handSortAnimation = new HandSortAnimation(this.scene);
+      handSortAnimation.sortPlayerHand(onComplete);
     }
   }
 }
