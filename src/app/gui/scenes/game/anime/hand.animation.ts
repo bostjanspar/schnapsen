@@ -3,10 +3,10 @@ import TWEEN from '@tweenjs/tween.js';
 import { GameConstants } from '../../../../logic/game.constants';
 
 export class HandAnimation {
-  private static lastUpdateTime: number = 0;
-  private static animationPhase: number = 0;
+  private lastUpdateTime: number = 0;
+  private animationPhase: number = 0;
 
-  static animateHandReorganization(hand: THREE.Group): void {
+  animateHandReorganization(hand: THREE.Group): void {
     const now = performance.now();
     
     // Limit animation updates to 30fps to reduce CPU usage

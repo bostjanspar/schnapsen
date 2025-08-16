@@ -122,7 +122,8 @@ export class GameScene extends BaseScene {
     const trickPosition = isPlayer ?
       new THREE.Vector3(0, 0, -1) :
       new THREE.Vector3(0, 0, 1);
-    CardPlayAnimation.animateCardPlay(cardMesh, fromPos, trickPosition);
+    const cardPlayAnimation = new CardPlayAnimation();
+    cardPlayAnimation.animateCardPlay(cardMesh, fromPos, trickPosition);
 
     // Remove from hand group and add to trick group
     if (isPlayer) {
@@ -208,7 +209,8 @@ export class GameScene extends BaseScene {
     // Only animate hand reorganization if there are selected cards
     const hasSelectedCards = this.playerHandGroup.children.some(child => child.userData['selected']);
     if (hasSelectedCards) {
-      HandAnimation.animateHandReorganization(this.playerHandGroup);
+      const handAnimation = new HandAnimation();
+      handAnimation.animateHandReorganization(this.playerHandGroup);
       this.needsUpdate = true;
     }
     
@@ -227,22 +229,24 @@ export class GameScene extends BaseScene {
       
       // Case 1: Mouse is not over a new card, but a card was hovered before. Unhover it.
       if (this.hoveredCard && this.hoveredCard !== card) {
+        const cardHoverAnimation = new CardHoverAnimation();
         if (this.hoveredCardPlayable) {
-          CardHoverAnimation.animatePlayableCardHover(this.hoveredCard as THREE.Mesh, false);
+          cardHoverAnimation.animatePlayableCardHover(this.hoveredCard as THREE.Mesh, false);
         } else {
-          CardHoverAnimation.animateNonPlayableCardHover(this.hoveredCard as THREE.Mesh, false);
+          cardHoverAnimation.animateNonPlayableCardHover(this.hoveredCard as THREE.Mesh, false);
         }
         this.hoveredCard = null;
       }
 
       // Case 2: Mouse is over a new player card. Hover it.
       if (card && card !== this.hoveredCard) {
+        const cardHoverAnimation = new CardHoverAnimation();
         this.hoveredCard = card;
         this.hoveredCardPlayable = isPlayable;
         if (isPlayable) {
-          CardHoverAnimation.animatePlayableCardHover(card as THREE.Mesh, true);
+          cardHoverAnimation.animatePlayableCardHover(card as THREE.Mesh, true);
         } else {
-          CardHoverAnimation.animateNonPlayableCardHover(card as THREE.Mesh, true);
+          cardHoverAnimation.animateNonPlayableCardHover(card as THREE.Mesh, true);
         }
       }
     });
@@ -250,21 +254,17 @@ export class GameScene extends BaseScene {
 
 
   public animateDeal(): void {
-    const dealOrder = [
-      // First 3 cards
-      { isPlayer: false, hand: this.gameLogic.opponentHand, cardIndex: 0 },
-      { isPlayer: true, hand: this.gameLogic.playerHand, cardIndex: 0 },
-      { isPlayer: false, hand: this.gameLogic.opponentHand, cardIndex: 1 },
-      { isPlayer: true, hand: this.gameLogic.playerHand, cardIndex: 1 },
-      { isPlayer: false, hand: this.gameLogic.opponentHand, cardIndex: 2 },
-      { isPlayer: true, hand: this.gameLogic.playerHand, cardIndex: 2 },
-    ];
+    const cardDealAnimation = new CardDealAnimation();
+    const dealOrder = cardDealAnimation.createDealOrder(
+      this.gameLogic.playerHand, 
+      this.gameLogic.opponentHand
+    );
 
-    const deckPosition = new THREE.Vector3(GameConstants.DECK_LAYOUT.position.x, GameConstants.DECK_LAYOUT.position.y, GameConstants.DECK_LAYOUT.position.z);
+    const deckPosition = cardDealAnimation.getDeckPosition();
     let animationDelay = 0;
     const animationStepDelay = 200;
 
-    // Animate first 3 cards
+    // Animate cards
     dealOrder.forEach((deal) => {
       const card = deal.hand[deal.cardIndex];
       // Create cards with correct face orientation:
@@ -275,27 +275,14 @@ export class GameScene extends BaseScene {
       this.add(cardMesh);
 
       // Calculate correct positions based on the displayHands method
-      const playerHandPositions = CardLayout.calculateHandPositions(this.gameLogic.playerHand.length);
-      const opponentHandPositions = CardLayout.calculateHandPositions(this.gameLogic.opponentHand.length, 0.05); // Use 0.05 spacing for opponent
-      
-      let targetPosition;
-      if (deal.isPlayer) {
-        // Player cards at bottom
-        targetPosition = new THREE.Vector3(
-          playerHandPositions[deal.cardIndex].x, 
-          playerHandPositions[deal.cardIndex].y, 
-          playerHandPositions[deal.cardIndex].z
-        );
-      } else {
-        // Opponent cards at top (y + 5.5)
-        targetPosition = new THREE.Vector3(
-          opponentHandPositions[deal.cardIndex].x, 
-          opponentHandPositions[deal.cardIndex].y + 5.5, 
-          opponentHandPositions[deal.cardIndex].z
-        );
-      }
+      const targetPosition = cardDealAnimation.calculateTargetPosition(
+        deal.isPlayer,
+        deal.cardIndex,
+        this.gameLogic.playerHand.length,
+        this.gameLogic.opponentHand.length
+      );
 
-      CardDealAnimation.animateCardDeal(cardMesh, deal.isPlayer, targetPosition, animationDelay, () => {
+      cardDealAnimation.animateCardDeal(cardMesh, deal.isPlayer, targetPosition, animationDelay, () => {
         const targetGroup = deal.isPlayer ? this.playerHandGroup : this.opponentHandGroup;
         targetGroup.add(cardMesh);
       });
@@ -310,64 +297,15 @@ export class GameScene extends BaseScene {
       trumpMesh.position.copy(deckPosition);
       this.add(trumpMesh);
       
-      const trumpPosition = new THREE.Vector3(
-        GameConstants.TALON_LAYOUT.position.x + 1, 
-        GameConstants.TALON_LAYOUT.position.y, 
-        GameConstants.TALON_LAYOUT.position.z - 0.1
-      );
+      const trumpPosition = cardDealAnimation.getTrumpPosition();
 
-      CardDealAnimation.animateCardDeal(trumpMesh, true, trumpPosition, animationDelay, () => {
+      cardDealAnimation.animateCardDeal(trumpMesh, true, trumpPosition, animationDelay, () => {
         this.trumpCardMesh = trumpMesh;
         this.talonGroup.add(trumpMesh);
         trumpMesh.rotateZ(Math.PI/2);
       });
       animationDelay += animationStepDelay;
     }
-
-    const dealOrder2 = [
-      // Next 2 cards
-      { isPlayer: false, hand: this.gameLogic.opponentHand, cardIndex: 3 },
-      { isPlayer: true, hand: this.gameLogic.playerHand, cardIndex: 3 },
-      { isPlayer: false, hand: this.gameLogic.opponentHand, cardIndex: 4 },
-      { isPlayer: true, hand: this.gameLogic.playerHand, cardIndex: 4 },
-    ];
-
-    dealOrder2.forEach((deal) => {
-      const card = deal.hand[deal.cardIndex];
-      // Create cards with correct face orientation:
-      // - Opponent cards: always face down (false) - back texture shown
-      // - Player cards: always face up (true) - face texture shown
-      const cardMesh = this.cardManager.createCard(card, deal.isPlayer);
-      cardMesh.position.copy(deckPosition);
-      this.add(cardMesh);
-
-      // Calculate correct positions based on the displayHands method
-      const playerHandPositions = CardLayout.calculateHandPositions(this.gameLogic.playerHand.length);
-      const opponentHandPositions = CardLayout.calculateHandPositions(this.gameLogic.opponentHand.length, 0.05); // Use 0.05 spacing for opponent
-      
-      let targetPosition;
-      if (deal.isPlayer) {
-        // Player cards at bottom
-        targetPosition = new THREE.Vector3(
-          playerHandPositions[deal.cardIndex].x, 
-          playerHandPositions[deal.cardIndex].y, 
-          playerHandPositions[deal.cardIndex].z
-        );
-      } else {
-        // Opponent cards at top (y + 5.5)
-        targetPosition = new THREE.Vector3(
-          opponentHandPositions[deal.cardIndex].x, 
-          opponentHandPositions[deal.cardIndex].y + 5.5, 
-          opponentHandPositions[deal.cardIndex].z
-        );
-      }
-
-      CardDealAnimation.animateCardDeal(cardMesh, deal.isPlayer, targetPosition, animationDelay, () => {
-        const targetGroup = deal.isPlayer ? this.playerHandGroup : this.opponentHandGroup;
-        targetGroup.add(cardMesh);
-      });
-      animationDelay += animationStepDelay;
-    });
 
     // Animate talon
     if (this.gameLogic.talon.length > 0) {
@@ -376,13 +314,9 @@ export class GameScene extends BaseScene {
       talonStack.position.copy(deckPosition);
       this.add(talonStack);
       
-      const talonPosition = new THREE.Vector3(
-        GameConstants.TALON_LAYOUT.position.x, 
-        GameConstants.TALON_LAYOUT.position.y, 
-        GameConstants.TALON_LAYOUT.position.z
-      );
+      const talonPosition = cardDealAnimation.getTalonPosition();
 
-      CardDealAnimation.animateCardDeal(talonStack, false, talonPosition, animationDelay, () => {
+      cardDealAnimation.animateCardDeal(talonStack, false, talonPosition, animationDelay, () => {
         this.talonGroup.add(talonStack);
 
         this.displayHands(this.gameLogic.playerHand, this.gameLogic.opponentHand);

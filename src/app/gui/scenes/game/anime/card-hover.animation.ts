@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import TWEEN from '@tweenjs/tween.js';
 
 export class CardHoverAnimation {
-  static animatePlayableCardHover(card: THREE.Mesh, isHovering: boolean): void {
+  animatePlayableCardHover(card: THREE.Mesh, isHovering: boolean): void {
     const initialY = card.userData['initialY'] || card.position.y;
     if (isHovering) {
       card.userData['initialY'] = initialY;
@@ -18,7 +18,7 @@ export class CardHoverAnimation {
     }
   }
 
-  static animateNonPlayableCardHover(card: THREE.Mesh, isHovering: boolean): void {
+  animateNonPlayableCardHover(card: THREE.Mesh, isHovering: boolean): void {
     const initialX = card.userData['initialX'] = card.userData['initialX'] || card.position.x;
     
     TWEEN.remove(card.userData['tween']);
