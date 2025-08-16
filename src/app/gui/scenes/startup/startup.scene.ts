@@ -36,7 +36,7 @@ export class StartupScene extends BaseScene {
     this.add(startButton);
 
     this.translate.get('startGame').subscribe((text: string) => {
-      const textMesh = this.textService.createText(text, 0.2, 0xffffff);
+      const textMesh = this.textService.createText(text, 0.5, 0xffffff);
       textMesh.position.z = 0.01;
       startButton.add(textMesh);
     });
@@ -47,7 +47,7 @@ export class StartupScene extends BaseScene {
     this.add(langButton);
 
     const langTextKey = this.translate.currentLang === 'en' ? 'Deutsch' : 'English';
-    const langTextMesh = this.textService.createText(langTextKey, 0.15, 0xffffff);
+    const langTextMesh = this.textService.createText(langTextKey, 0.3, 0xffffff);
     langTextMesh.position.z = 0.01;
     langButton.add(langTextMesh);
   }

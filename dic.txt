@@ -30,3 +30,16 @@ But it never reacts by itself when some of the game logic member variable change
 
 
 Go through the code  of @src/app/gui/scenes/game and in @file src/app/gui/scenes/game/game.scene.ts implement to show talun and trumpCard under it.  display it as part of dealNewCards game.scene.ts
+
+
+
+display number of cards in card deck   with animation 
+
+
+@
+1. Click Feedback – When the user clicks the deck, the stack gives a small bounce or lift, and a faint glow or highlight briefly appears around the deck.
+2. Deck Expansion – The stack stretches upward as the cards separate slightly, making the pile look taller. Only the card backs are visible and no card faces are ever shown. This expansion lasts about 0.3 to 0.5 seconds.
+3. Card Count Reveal – A floating number (for example, “37”) fades in above or beside the stack. The number can animate smoothly by counting up or down from the previous value.
+4. Deck Collapse – After 1 to 2 seconds, the stack compresses back down into a neat pile. The floating number remains visible next to the deck.
+5. Idle State – The deck rests face-down as before, and the number remains in place until the count changes again.
+n.

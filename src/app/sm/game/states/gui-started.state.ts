@@ -14,7 +14,7 @@ export class GuiStartedState extends BaseState {
   onEntry(): void {
     console.log('Entering GuiStartedState');
      MaterialFactory.preloadAllMaterials().then(() => {
-      this.transition(StateEnum.DEAL_CARDS)
+      //this.transition(StateEnum.DEAL_CARDS)
     });
   }
 

@@ -9,6 +9,7 @@ import TWEEN from '@tweenjs/tween.js';
 import { Card } from '../../../logic/schnapsen.rules';
 import { CardLayout } from './cards/card-layout';
 import { GameLogic } from '../../../logic/game-logic';
+import { TextService } from '../../services/text.service';
 
 // Import specialized animation classes
 import { CardDealAnimation } from './anime/card-deal.animation';
@@ -17,6 +18,7 @@ import { CardHoverAnimation } from './anime/card-hover.animation';
 import { HandAnimation } from './anime/hand.animation';
 import { TrickAnimation } from './anime/trick.animation';
 import { HandSortAnimation } from './anime/hand-sort.animation';
+import { TalonCountAnimation } from './anime/talon-count.animation';
 
 
 
@@ -28,6 +30,9 @@ export class GameScene extends BaseScene {
   private needsUpdate: boolean = false;
   private gameLogic: GameLogic;
   private trumpCardMesh: THREE.Mesh | null = null;
+  private textService!: TextService;
+  private talonCountAnimation!: TalonCountAnimation;
+  private talonCardPositions: { x: number; y: number; z: number }[] = [];
 
   
   // Card groups for easy management
@@ -40,7 +45,10 @@ export class GameScene extends BaseScene {
 
  
 
-  constructor(protected override readonly camera: THREE.Camera, gameLogic: GameLogic) {     
+  constructor(
+    protected override readonly camera: THREE.Camera, 
+    gameLogic: GameLogic
+  ) {     
     super(camera);
     this.gameLogic = gameLogic;
     //this.background = new THREE.Color(0x1a4a3a); // Dark green table color
@@ -50,6 +58,9 @@ export class GameScene extends BaseScene {
   public async initialize(threeService: ThreeService) {
     this.cardManager = new CardManager(this);
     this.gameInteractions = new GameInteractions(this);
+    // Get text service from threeService
+    this.textService = (threeService as any).textService;
+    this.talonCountAnimation = new TalonCountAnimation(this);
 
     await MaterialFactory.preloadAllMaterials();
     this.setupTable();
@@ -189,7 +200,16 @@ export class GameScene extends BaseScene {
 
 
   public onMouseEvent(mouse: THREE.Vector2): void {
+    // First check if the click is on the talon group
     this.gameInteractions.handleCardClick(mouse, this.camera, (card) => {
+      // Check if the clicked card is part of the talon group
+      if (card.parent === this.talonGroup) {
+        // Display talon count animation
+        this.displayTalonCount();
+        return;
+      }
+      
+      // If not on talon, check if it's a player card
       if (card.parent !== this.playerHandGroup) {
         return;
       }
@@ -274,7 +294,23 @@ export class GameScene extends BaseScene {
     this.animateDeal();
   }
 
-  private updateTalonDisplay(talonCards: Card[]): void {
+  /**
+   * Display the talon count with animation
+   */
+  public displayTalonCount(): void {
+    const talonCount = this.gameLogic.talon.length;
+    this.talonCountAnimation.animateTalonCount(talonCount);
+  }
+
+  /**
+   * Update the talon count display without animation
+   */
+  public updateTalonCount(): void {
+    const talonCount = this.gameLogic.talon.length;
+    this.talonCountAnimation.updateCount(talonCount);
+  }
+
+    private updateTalonDisplay(talonCards: Card[]): void {
     // Clear existing talon display
     this.talonGroup.clear();
     
