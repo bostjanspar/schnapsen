@@ -257,80 +257,12 @@ export class GameScene extends BaseScene {
 
   public animateDeal(): void {
     const cardDealAnimation = new CardDealAnimation(this);
-    const dealOrder = cardDealAnimation.createDealOrder(
-      this.gameLogic.playerHand, 
-      this.gameLogic.opponentHand
+    cardDealAnimation.animateCompleteDeal(
+      this.gameLogic.playerHand,
+      this.gameLogic.opponentHand,
+      this.gameLogic.trumpCard || null,
+      this.gameLogic.talon
     );
-
-    const deckPosition = cardDealAnimation.getDeckPosition();
-    let animationDelay = 0;
-    const animationStepDelay = 200;
-
-    // Animate cards
-    dealOrder.forEach((deal) => {
-      const card = deal.hand[deal.cardIndex];
-      // Create cards with correct face orientation:
-      // - Opponent cards: always face down (false) - back texture shown
-      // - Player cards: always face up (true) - face texture shown
-      const cardMesh = this.cardManager.createCard(card, deal.isPlayer);
-      cardMesh.position.copy(deckPosition);
-      this.add(cardMesh);
-
-      // Calculate correct positions based on the displayHands method
-      const targetPosition = cardDealAnimation.calculateTargetPosition(
-        deal.isPlayer,
-        deal.cardIndex,
-        this.gameLogic.playerHand.length,
-        this.gameLogic.opponentHand.length
-      );
-
-      cardDealAnimation.animateCardDeal(cardMesh, deal.isPlayer, targetPosition, animationDelay, () => {
-        const targetGroup = deal.isPlayer ? this.playerHandGroup : this.opponentHandGroup;
-        targetGroup.add(cardMesh);
-      });
-      animationDelay += animationStepDelay;
-    });
-
-    // Animate trump card
-    const trumpCard = this.gameLogic.trumpCard;
-    if (trumpCard) {
-      // Trump card should be face up (player can see it)
-      const trumpMesh = this.cardManager.createCard(trumpCard, true);
-      trumpMesh.position.copy(deckPosition);
-      this.add(trumpMesh);
-      
-      const trumpPosition = cardDealAnimation.getTrumpPosition();
-
-      cardDealAnimation.animateCardDeal(trumpMesh, true, trumpPosition, animationDelay, () => {
-        this.trumpCardMesh = trumpMesh;
-        this.talonGroup.add(trumpMesh);
-        trumpMesh.rotateZ(Math.PI/2);
-      });
-      animationDelay += animationStepDelay;
-    }
-
-    // Animate talon
-    if (this.gameLogic.talon.length > 0) {
-      // Talon card should be face down (player cannot see it)
-      const talonStack = this.cardManager.createCard(this.gameLogic.talon[0], false);
-      talonStack.position.copy(deckPosition);
-      this.add(talonStack);
-      
-      const talonPosition = cardDealAnimation.getTalonPosition();
-
-      cardDealAnimation.animateCardDeal(talonStack, false, talonPosition, animationDelay, () => {
-        this.talonGroup.add(talonStack);
-
-        this.displayHands(this.gameLogic.playerHand, this.gameLogic.opponentHand);
-        this.updateTalonDisplay(this.gameLogic.talon);
-        if (this.gameLogic.trumpCard) {
-          this.updateTrumpCardDisplay(this.gameLogic.trumpCard);
-        }
-        this.sortPlayerHand();
-        console.log("animation done");
-        
-      });
-    }
   }
 
   private sortPlayerHand(): void {

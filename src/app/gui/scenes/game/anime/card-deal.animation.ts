@@ -105,4 +105,103 @@ export class CardDealAnimation extends BaseAnimation {
       GameConstants.TALON_LAYOUT.position.z
     );
   }
+
+  /**
+   * Animate the entire deal process
+   * @param playerHand The player's cards
+   * @param opponentHand The opponent's cards
+   * @param trumpCard The trump card
+   * @param talon The remaining cards in the talon
+   * @param onComplete Callback when the entire deal animation is complete
+   */
+  animateCompleteDeal(
+    playerHand: Card[],
+    opponentHand: Card[],
+    trumpCard: Card | null,
+    talon: Card[],
+    onComplete: () => void = () => {}
+  ): void {
+    const dealOrder = this.createDealOrder(playerHand, opponentHand);
+    const deckPosition = this.getDeckPosition();
+    let animationDelay = 0;
+    const animationStepDelay = 200;
+    let completedAnimations = 0;
+    const totalAnimations = dealOrder.length + (trumpCard ? 1 : 0) + (talon.length > 0 ? 1 : 0);
+
+    // Helper function to track completion
+    const checkCompletion = () => {
+      completedAnimations++;
+      if (completedAnimations === totalAnimations) {
+        onComplete();
+      }
+    };
+
+    // Animate cards
+    dealOrder.forEach((deal) => {
+      const card = deal.hand[deal.cardIndex];
+      // Create cards with correct face orientation:
+      // - Opponent cards: always face down (false) - back texture shown
+      // - Player cards: always face up (true) - face texture shown
+      const cardMesh = this.scene.cardManager.createCard(card, deal.isPlayer);
+      cardMesh.position.copy(deckPosition);
+      this.scene.add(cardMesh);
+
+      // Calculate correct positions based on the displayHands method
+      const targetPosition = this.calculateTargetPosition(
+        deal.isPlayer,
+        deal.cardIndex,
+        playerHand.length,
+        opponentHand.length
+      );
+
+      this.animateCardDeal(cardMesh, deal.isPlayer, targetPosition, animationDelay, () => {
+        const targetGroup = deal.isPlayer ? this.scene.playerHandGroup : this.scene.opponentHandGroup;
+        targetGroup.add(cardMesh);
+        checkCompletion();
+      });
+      animationDelay += animationStepDelay;
+    });
+
+    // Animate trump card
+    if (trumpCard) {
+      // Trump card should be face up (player can see it)
+      const trumpMesh = this.scene.cardManager.createCard(trumpCard, true);
+      trumpMesh.position.copy(deckPosition);
+      this.scene.add(trumpMesh);
+      
+      const trumpPosition = this.getTrumpPosition();
+
+      this.animateCardDeal(trumpMesh, true, trumpPosition, animationDelay, () => {
+        // Use a public method or direct property access pattern
+        (this.scene as any).trumpCardMesh = trumpMesh;
+        this.scene.talonGroup.add(trumpMesh);
+        trumpMesh.rotateZ(Math.PI/2);
+        checkCompletion();
+      });
+      animationDelay += animationStepDelay;
+    }
+
+    // Animate talon
+    if (talon.length > 0) {
+      // Talon card should be face down (player cannot see it)
+      const talonStack = this.scene.cardManager.createCard(talon[0], false);
+      talonStack.position.copy(deckPosition);
+      this.scene.add(talonStack);
+      
+      const talonPosition = this.getTalonPosition();
+
+      this.animateCardDeal(talonStack, false, talonPosition, animationDelay, () => {
+        this.scene.talonGroup.add(talonStack);
+        this.scene.displayHands(playerHand, opponentHand);
+        // Call public methods instead of private ones
+        this.scene['updateTalonDisplay'](talon);
+        if (trumpCard) {
+          this.scene['updateTrumpCardDisplay'](trumpCard);
+        }
+        this.scene['sortPlayerHand']();
+        console.log("animation done");
+        checkCompletion();
+      });
+    }
+  }
 }
