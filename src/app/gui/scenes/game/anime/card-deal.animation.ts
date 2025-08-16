@@ -178,7 +178,7 @@ export class CardDealAnimation extends BaseAnimation {
         // Use a public method or direct property access pattern
         (this.scene as any).trumpCardMesh = trumpMesh;
         this.scene.talonGroup.add(trumpMesh);
-        trumpMesh.rotateZ(Math.PI/2);
+        trumpMesh.rotateZ(-Math.PI/2);
         checkCompletion();
       });
       animationDelay += animationStepDelay;

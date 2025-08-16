@@ -305,7 +305,7 @@ export class GameScene extends BaseScene {
     const trumpCardMesh = this.cardManager.createCard(trumpCard, true); // Trump card is face up
     const talonPosition = GameConstants.TALON_LAYOUT.position;
 
-    trumpCardMesh.rotateZ(Math.PI/2); // Rotate trump card 90 degrees
+    trumpCardMesh.rotateZ(-Math.PI/2); // Rotate trump card 90 degrees
     // Position trump card below the talon
     trumpCardMesh.position.set(
       talonPosition.x + 1,
@@ -319,6 +319,6 @@ export class GameScene extends BaseScene {
     
     // Add to scene
     this.add(trumpCardMesh);
-  }
+    }
 
 }
