@@ -45,7 +45,6 @@ export class TalonCountAnimation extends BaseAnimation {
       return;
     }
 
-<<<<<<< HEAD
     if (this.scaleTween) {
       this.scaleTween.stop();
     }
@@ -59,18 +58,6 @@ export class TalonCountAnimation extends BaseAnimation {
       .repeat(1)
       .yoyo(true)
       .easing(TWEEN.Easing.Elastic.Out)
-=======
-    // Ensure we start from a clean state
-    TWEEN.remove(this.countText.scale as any);
-    this.countText.scale.set(1, 1, 1);
-
-    const targetScale = { x: 1.4, y: 1.4, z: 1.4 };
-
-    // Animate with a "bouncy pop"
-    new TWEEN.Tween(this.countText.scale)
-      .to(targetScale, 300)
-      .easing(TWEEN.Easing.Back.Out) // This easing overshoots and comes back
->>>>>>> 4f7b95bf8ebc4a3be672505327bee68e3b8a6d8a
       .start();
   }
 
