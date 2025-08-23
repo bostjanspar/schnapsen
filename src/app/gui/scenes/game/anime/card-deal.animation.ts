@@ -6,9 +6,10 @@ import { CardLayout } from '../cards/card-layout';
 import { BaseAnimation } from './base.animation';
 import { GameScene } from '../game.scene';
 import { HandSortAnimation } from './hand-sort.animation';
+import { CardManager } from '../cards/card-manager';
 
 export class CardDealAnimation extends BaseAnimation {
-  constructor(scene: GameScene) {
+  constructor(scene: GameScene, private cardManager: CardManager) {
     super(scene);
   }
 
@@ -145,7 +146,7 @@ export class CardDealAnimation extends BaseAnimation {
       // Create cards with correct face orientation:
       // - Opponent cards: always face down (false) - back texture shown
       // - Player cards: always face up (true) - face texture shown
-      const cardMesh = this.scene.cardManager.createCard(card, deal.isPlayer);
+      const cardMesh = this.cardManager.createCard(card, deal.isPlayer);
       cardMesh.position.copy(deckPosition);
       this.scene.add(cardMesh);
 
@@ -168,7 +169,7 @@ export class CardDealAnimation extends BaseAnimation {
     // Animate trump card
     if (trumpCard) {
       // Trump card should be face up (player can see it)
-      const trumpMesh = this.scene.cardManager.createCard(trumpCard, true);
+      const trumpMesh = this.cardManager.createCard(trumpCard, true);
       trumpMesh.position.copy(deckPosition);
       this.scene.add(trumpMesh);
       
@@ -187,7 +188,7 @@ export class CardDealAnimation extends BaseAnimation {
     // Animate talon
     if (talon.length > 0) {
       // Talon card should be face down (player cannot see it)
-      const talonStack = this.scene.cardManager.createCard(talon[0], false);
+      const talonStack = this.cardManager.createCard(talon[0], false);
       talonStack.position.copy(deckPosition);
       this.scene.add(talonStack);
       
