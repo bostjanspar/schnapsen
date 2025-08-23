@@ -18,14 +18,15 @@ export class TalonCountAnimation extends BaseAnimation {
   public animateTalonCount(count: number): void {
     // Step 1: Click Feedback - Small bounce or lift with glow
     this.animateClickFeedback(() => {
+      console.log(`Animating talon count: ${count}`);
       // Step 2: Deck Expansion - Stack stretches upward
-      this.animateDeckExpansion(() => {
-        // Step 3: Card Count Reveal - Floating number fades in
-        this.animateCountReveal(count, () => {
-          // Step 4: Deck Collapse - Stack compresses back down
-          this.animateDeckCollapse();
-        });
-      });
+      // this.animateDeckExpansion(() => {
+      //   // Step 3: Card Count Reveal - Floating number fades in
+      //   this.animateCountReveal(count, () => {
+      //     // Step 4: Deck Collapse - Stack compresses back down
+      //     this.animateDeckCollapse();
+      //   });
+      //});
     });
   }
 
