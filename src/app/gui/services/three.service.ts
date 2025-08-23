@@ -76,7 +76,6 @@ export class ThreeService {
     
     // Start animation loop
     this.animate();
-   
   }
 
   public setActiveScene(scene: SchnapsenScene): BaseScene  {
@@ -85,6 +84,10 @@ export class ThreeService {
 
     this.activeScene = newScene
     return newScene;    
+  }
+
+  public getTextService(): TextService {
+    return this.textService;
   }
 
   private buildScenes(sceneEnum: SchnapsenScene) : BaseScene {

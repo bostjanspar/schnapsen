@@ -10,6 +10,7 @@ import { Card } from '../../../logic/schnapsen.rules';
 import { CardLayout } from './cards/card-layout';
 import { GameLogic } from '../../../logic/game-logic';
 import { TextService } from '../../services/text.service';
+import { Text } from 'troika-three-text';
 
 // Import specialized animation classes
 import { CardDealAnimation } from './anime/card-deal.animation';
@@ -23,7 +24,7 @@ import { TalonCountAnimation } from './anime/talon-count.animation';
 
 
 export class GameScene extends BaseScene {
-  public cardManager!: CardManager;
+  private cardManager!: CardManager;
   private gameInteractions!: GameInteractions;
   private hoveredCard: THREE.Object3D | null = null;
   private hoveredCardPlayable: boolean = false;
@@ -31,8 +32,7 @@ export class GameScene extends BaseScene {
   private gameLogic: GameLogic;
   private trumpCardMesh: THREE.Mesh | null = null;
   private textService!: TextService;
-  private talonCountAnimation!: TalonCountAnimation;
-  private talonCardPositions: { x: number; y: number; z: number }[] = [];
+  private countText: Text | null = null;
 
   
   // Card groups for easy management
@@ -59,8 +59,7 @@ export class GameScene extends BaseScene {
     this.cardManager = new CardManager(this);
     this.gameInteractions = new GameInteractions(this);
     // Get text service from threeService
-    this.textService = (threeService as any).textService;
-    this.talonCountAnimation = new TalonCountAnimation(this);
+    this.textService =threeService.getTextService();
 
     await MaterialFactory.preloadAllMaterials();
     this.setupTable();
@@ -82,6 +81,12 @@ export class GameScene extends BaseScene {
     this.talonGroup.name = 'talon';
     this.add(this.talonGroup);
 
+  
+    this.countText = this.textService.createText('', 0.7, 0xffffff);
+    this.countText.visible = false;
+    this.countText.name = 'talonCount';
+    this.add(this.countText);
+  
     this.currentTrickGroup.name = 'currentTrick';
     this.add(this.currentTrickGroup);
 
@@ -277,7 +282,7 @@ export class GameScene extends BaseScene {
 
 
   public animateDeal(): void {
-    const cardDealAnimation = new CardDealAnimation(this);
+    const cardDealAnimation = new CardDealAnimation(this, this.cardManager);
     cardDealAnimation.animateCompleteDeal(
       this.gameLogic.playerHand,
       this.gameLogic.opponentHand,
@@ -298,16 +303,7 @@ export class GameScene extends BaseScene {
    * Display the talon count with animation
    */
   public displayTalonCount(): void {
-    const talonCount = this.gameLogic.talon.length;
-    this.talonCountAnimation.animateTalonCount(talonCount);
-  }
-
-  /**
-   * Update the talon count display without animation
-   */
-  public updateTalonCount(): void {
-    const talonCount = this.gameLogic.talon.length;
-    this.talonCountAnimation.updateCount(talonCount);
+    new TalonCountAnimation(this, this.countText).triggerHeartbeatAnimation();
   }
 
     private updateTalonDisplay(talonCards: Card[]): void {
@@ -320,13 +316,16 @@ export class GameScene extends BaseScene {
     // Create a placeholder card to represent the talon stack
     if (talonCards.length > 0) {
       
-      const cardMesh = this.cardManager.createCard(talonCards[0], false);;
+      const cardMesh = this.cardManager.createCard(talonCards[0], false);
       cardMesh.position.set(talonPosition.x, talonPosition.y, talonPosition.z);
       cardMesh.name = 'talonStack';
       
       this.talonGroup.add(cardMesh);
-      
-      
+    }
+
+    if (this.countText){
+      this.countText.text = talonCards.length ?  talonCards.length.toString() : '';
+      this.countText.visible = !!talonCards.length;
     }
   }
 
