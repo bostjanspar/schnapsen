@@ -45,7 +45,7 @@ export class MaterialFactory {
 
     // Preload card back
     const cardBackTexture = TextureUtils.createCardBackTexture('default', []);
-    const cardBackMaterial = new THREE.MeshLambertMaterial({
+    const cardBackMaterial = new THREE.MeshBasicMaterial({
             map: cardBackTexture,
       transparent: true,
     });
@@ -61,7 +61,7 @@ export class MaterialFactory {
         const path = `/assets/cards/${suit}_${rank}.svg`;
         const promise = new Promise<void>((resolve) => {
           textureLoader.load(path, (texture) => {
-            const material = new THREE.MeshLambertMaterial({ map: texture, transparent: true });
+            const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
             this.materialCache.set(`${cardId}`, material);
             resolve();
           });
