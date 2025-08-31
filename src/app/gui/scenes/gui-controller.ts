@@ -4,10 +4,14 @@ import { Card } from '../../logic/schnapsen.rules';
 import { SchnapsenScene } from './schnapsen-scene.enum';
 import { SelectDealerScene } from './select-dealer/select-dealer.scene';
 import { GameScene } from './game/game.scene';
+import { GameLogic } from '../../logic/game-logic';
 
 export class GuiController{
 
-  constructor(private readonly threeService: ThreeService) {
+  constructor(
+    private readonly threeService: ThreeService,
+    private readonly gameLogic: GameLogic
+  ) {
   }
 
   public electNewGameDealer(dealerCard: Card | null, newDealer: number): void {
@@ -28,5 +32,16 @@ export class GuiController{
     }
     // Refresh the display with current GameLogic state
     scene.dealNewCards();
+    
+  }
+
+  public displayHands() {
+     const scene =  this.threeService.setActiveScene(SchnapsenScene.Game);
+    if (!(scene instanceof GameScene)) {
+      // Don't throw error, just ignore if the scene is not the game scene
+      return;
+    }
+    scene.displayHands(this.gameLogic.playerHand, this.gameLogic.opponentHand,
+      this.gameLogic.talon, this.gameLogic.trumpCard);
   }
 }

@@ -196,11 +196,7 @@ export class CardDealAnimation extends BaseAnimation {
 
       this.animateCardDeal(talonStack, false, talonPosition, animationDelay, () => {
         this.scene.talonGroup.add(talonStack);
-        this.scene.displayHands(playerHand, opponentHand);
-        this.scene['updateTalonDisplay'](talon);
-        if (trumpCard) {
-          this.scene['updateTrumpCardDisplay'](trumpCard);
-        }
+        this.scene.displayHands(playerHand, opponentHand, talon, trumpCard);
         // The hand sorting will be called after all deal animations are complete
         checkCompletion();
       });

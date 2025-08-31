@@ -3,6 +3,7 @@ import { StateEnum } from '../../state.enum';
 import { EventEnum, SimpleEvent } from '../../../events/event.enum';
 import { GameStateMachine } from '../game-state-machine';
 import { MaterialFactory } from '../../../gui/utils/material.factory';
+import { environment } from '../../../../environments/environment';
 
 export class GuiStartedState extends BaseState {
   constructor(
@@ -14,7 +15,9 @@ export class GuiStartedState extends BaseState {
   onEntry(): void {
     console.log('Entering GuiStartedState');
      MaterialFactory.preloadAllMaterials().then(() => {
-      //this.transition(StateEnum.DEAL_CARDS)
+        if (environment['fast-game-start']) {
+            this.transition(StateEnum.SELECT_DEALER);
+        }
     });
   }
 

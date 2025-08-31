@@ -3,6 +3,7 @@ import { StateEnum } from '../../state.enum';
 import {  EventEnum, SimpleEvent } from '../../../events/event.enum';
 import { GameStateMachine } from '../game-state-machine';
 import { Suit } from '../../../logic/schnapsen.rules';
+import { environment } from '../../../../environments/environment';
 
 export class SelectDealerState extends BaseState {
   constructor(
@@ -18,11 +19,19 @@ export class SelectDealerState extends BaseState {
       const newDealer = (dealerCard.suit  === Suit.HEARTS || (dealerCard.suit  === Suit.DIAMONDS) ) ? 0 : 1;
 
       this.machine.gameLogic.dealer$.next(newDealer);
-      this.machine.guiController.electNewGameDealer(dealerCard, newDealer);
+      if (environment['fast-dealer-election']) {
+        this.transition(StateEnum.DEAL_CARDS);
+      } else {
+        this.machine.guiController.electNewGameDealer(dealerCard, newDealer);
+      }
     } else {
       const newDealer = this.machine.gameLogic.dealer$.getValue() === 0 ? 1 : 0;
       this.machine.gameLogic.dealer$.next( newDealer);
-      this.machine.guiController.electNewGameDealer(null, newDealer);
+      if (environment['fast-dealer-election']) {
+        this.transition(StateEnum.DEAL_CARDS);
+      } else {
+        this.machine.guiController.electNewGameDealer(null, newDealer);
+      }
     }
   }
 

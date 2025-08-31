@@ -67,7 +67,7 @@ export class ThreeService {
    
     const sm = new GameStateMachine(
       this.gameLogic,
-      new GuiController(this)      
+      new GuiController(this, this.gameLogic)      
     );
 
     this.eventSubject.subscribe(event => {
@@ -76,6 +76,10 @@ export class ThreeService {
     
     // Start animation loop
     this.animate();
+  }
+
+  public getActiveScene(): BaseScene {
+    return this.activeScene;
   }
 
   public setActiveScene(scene: SchnapsenScene): BaseScene  {
@@ -98,7 +102,7 @@ export class ThreeService {
         return new SelectDealerScene(this.eventSubject, this.camera);
       case SchnapsenScene.Game:{
          // Scenes
-        const gameScene = new GameScene(this.camera, this.gameLogic);
+        const gameScene = new GameScene(this.camera, this.gameLogic, this.eventSubject);
         gameScene.initialize(this);
         return gameScene;
       }

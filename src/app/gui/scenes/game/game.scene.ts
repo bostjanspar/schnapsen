@@ -20,8 +20,8 @@ import { HandAnimation } from './anime/hand.animation';
 import { TrickAnimation } from './anime/trick.animation';
 import { HandSortAnimation } from './anime/hand-sort.animation';
 import { TalonCountAnimation } from './anime/talon-count.animation';
-
-
+import { EventEnum, SimpleEvent } from '../../../events/event.enum';
+import { Subject } from 'rxjs';
 
 export class GameScene extends BaseScene {
   private cardManager!: CardManager;
@@ -47,7 +47,8 @@ export class GameScene extends BaseScene {
 
   constructor(
     protected override readonly camera: THREE.Camera, 
-    gameLogic: GameLogic
+    gameLogic: GameLogic,
+    private readonly eventSubject: Subject<SimpleEvent>
   ) {     
     super(camera);
     this.gameLogic = gameLogic;
@@ -114,8 +115,8 @@ export class GameScene extends BaseScene {
     this.add(table);
   }
 
-  
-  public displayHands(playerCards: Card[], opponentCards: Card[]): void {
+
+  public displayHands(playerCards: Card[], opponentCards: Card[], talonCards: Card[], trumpCard: Card | null): void {
     this.playerHandGroup.clear();
     const playerHandPositions = CardLayout.calculateHandPositions(playerCards.length);
     playerCards.forEach((card, i) => {
@@ -132,7 +133,13 @@ export class GameScene extends BaseScene {
         cardMesh.position.set(opponentHandPositions[i].x, opponentHandPositions[i].y + 5.5, opponentHandPositions[i].z);
         this.opponentHandGroup.add(cardMesh);
     });
-  }
+
+
+    this.updateTalonDisplay(talonCards);
+    if (trumpCard) {
+        this.updateTrumpCardDisplay(trumpCard);
+      }
+}
 
 
   public playCardToTrick(cardId: string, isPlayer: boolean): void {
@@ -285,13 +292,14 @@ export class GameScene extends BaseScene {
   }
 
 
-  public animateDeal(): void {
+  public animateDeal(onComplete: () => void): void {
     const cardDealAnimation = new CardDealAnimation(this, this.cardManager);
     cardDealAnimation.animateCompleteDeal(
       this.gameLogic.playerHand,
       this.gameLogic.opponentHand,
       this.gameLogic.trumpCard || null,
-      this.gameLogic.talon
+      this.gameLogic.talon,
+      onComplete
     );
   }
 
@@ -300,7 +308,9 @@ export class GameScene extends BaseScene {
    * This method should be called manually from the GUI controller when game state changes
    */
   public dealNewCards(): void {
-    this.animateDeal();
+    this.animateDeal(() => {
+      this.eventSubject.next(new SimpleEvent(EventEnum.CARDS_DEALT));
+    });
   }
 
   /**
